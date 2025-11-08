@@ -1,0 +1,10 @@
+﻿@using WebApp.Entities
+@{
+    var optionModel = (Option)Model;
+}
+<a href="/" class="navbar-brand p-0">
+    <h1 class="m-0">
+        @Html.Raw(optionModel.Key)
+        @optionModel.Value
+    </h1>
+</a>

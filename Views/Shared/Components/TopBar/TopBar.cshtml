@@ -1,0 +1,33 @@
+﻿@using WebApp.Entities
+@using WebApp.ViewModels
+@{
+    var viewModel = (TopBarViewModels)Model;
+}
+<div class="container-fluid bg-dark px-5 d-none d-lg-block">
+    <div class="row gx-0">
+        <div class="col-lg-8 text-center text-lg-start mb-2 mb-lg-0">
+            <div class="d-inline-flex align-items-center" style="height: 45px;">
+                @foreach (Option oneOption in viewModel.ContactInformation)
+
+                {
+                    <small class="text-light">
+                        @Html.Raw(oneOption.Key)
+                        @oneOption.Value
+                    </small>
+                }
+            </div>
+        </div>
+        <div class="col-lg-4 text-center text-lg-end">
+            <div class="d-inline-flex align-items-center" style="height: 45px;">
+                @foreach (Option oneOption in viewModel.SocialLinks)
+
+                {
+                    <a class="btn btn-sm btn-outline-light btn-sm-square rounded-circle me-2"
+                       href=@oneOption.Value>
+                        @Html.Raw(oneOption.Key)
+                    </a>
+                }
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,104 @@
+﻿@using WebApp.Entities
+@model IEnumerable<WebApp.Entities.Navigate>
+
+
+<style>
+    .dropdown-menu .dropdown-menu {
+        top: 0;
+        left: 100%;
+        margin-top: -8px;
+        margin-left: 0;
+    }
+</style>
+
+
+
+@functions{
+    private void RenderMenuItems(IEnumerable<Navigate> items, bool isRoot = true, int level = 0)
+    {
+        foreach (Navigate navElement in items)
+        {
+            if (navElement.Childs?.Any() == true)
+            {
+                if (isRoot)
+                {
+                    <div class="nav-item dropdown">
+                        <a href="@navElement.Href" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
+                            @navElement.Title
+                        </a>
+                        <ul class="dropdown-menu m-0">
+                            @{ RenderMenuItems(navElement.Childs, false, level + 1);}
+                        </ul>
+                    </div>
+                }
+                else
+                {
+                    <li class="dropend">
+                        <a href="@navElement.Href" class="dropdown-item dropdown-toggle" data-bs-toggle="dropdown">
+                            @navElement.Title  
+                        </a>
+                        <ul class="dropdown-menu">
+                            @{ RenderMenuItems(navElement.Childs, false, level + 1);}
+                                                
+                        </ul>
+                   </li>
+
+                }
+            }
+            else
+            {
+                if (isRoot)
+                {
+                    <a href="@navElement.Href" class="nav-item nav-link">
+                        @navElement.Title
+                    </a>
+
+                }
+                else
+                {
+                   <li>
+                        <a href="@navElement.Href" class="dropdown-item">@navElement.Title</a>
+                   </li> 
+                }
+            }
+        }
+    }
+}
+
+
+<div class="navbar-nav ms-auto py-0">
+    @{
+        RenderMenuItems(Model);
+    }
+</div>
+
+
+
+
+
+
+@*
+   @using WebApp.Entities
+
+   <div class="navbar-nav ms-auto py-0">
+       @foreach (Navigate navElement in Model)
+       {
+           @if (navElement.ParentID == null && navElement.Childs.Count == 0)
+           {
+               <a href="@navElement.Href" class="nav-item nav-link active">@navElement.Title</a>
+           }
+           else
+           {
+               <div class="nav-item dropdown">
+                   <a href="@navElement.Href" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">@navElement.Title</a>
+                   <div class="dropdown-menu m-0">
+                       @foreach (Navigate oneChild in navElement.Childs)
+                       {
+                           <a href="@oneChild.Href" class="dropdown-item">@oneChild.Title</a>
+                       }
+                   </div>
+               </div>
+           }
+       }
+   </div>
+*@

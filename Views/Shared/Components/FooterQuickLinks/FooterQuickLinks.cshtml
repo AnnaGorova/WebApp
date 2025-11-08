@@ -1,0 +1,16 @@
+﻿@using WebApp.Entities
+
+
+  
+<div class="link-animated d-flex flex-column justify-content-start">
+
+    @foreach (var link in Model)
+    {
+        <a class="text-light mb-2" href="@link.Href"><i class="bi bi-arrow-right text-primary me-2"></i>
+            @link.Title
+        </a>
+    }
+
+</div>
+        
+        

@@ -1,0 +1,135 @@
+is_global = true
+build_property.TargetFramework = net8.0
+build_property.TargetFramework = net8.0
+build_property.TargetPlatformMinVersion = 
+build_property.TargetPlatformMinVersion = 
+build_property.UsingMicrosoftNETSdkWeb = true
+build_property.UsingMicrosoftNETSdkWeb = true
+build_property.ProjectTypeGuids = 
+build_property.ProjectTypeGuids = 
+build_property.InvariantGlobalization = 
+build_property.InvariantGlobalization = 
+build_property.PlatformNeutralAssembly = 
+build_property.PlatformNeutralAssembly = 
+build_property.EnforceExtendedAnalyzerRules = 
+build_property.EnforceExtendedAnalyzerRules = 
+build_property._SupportedPlatformList = Linux,macOS,Windows
+build_property._SupportedPlatformList = Linux,macOS,Windows
+build_property.RootNamespace = WebApp
+build_property.RootNamespace = WebApp
+build_property.ProjectDir = C:\Users\Анютка\Desktop\лекції\Розробка вебдодатків з використанням технології ASP.NET Core\WebApp\
+build_property.EnableComHosting = 
+build_property.EnableGeneratedComInterfaceComImportInterop = 
+build_property.RazorLangVersion = 8.0
+build_property.SupportLocalizedComponentNames = 
+build_property.GenerateRazorMetadataSourceChecksumAttributes = 
+build_property.MSBuildProjectDirectory = C:\Users\Анютка\Desktop\лекції\Розробка вебдодатків з використанням технології ASP.NET Core\WebApp
+build_property._RazorSourceGeneratorDebug = 
+
+[C:/Users/Анютка/Desktop/лекції/Розробка вебдодатків з використанням технології ASP.NET Core/WebApp/Views/About/ContactUs.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWJvdXRcQ29udGFjdFVzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Анютка/Desktop/лекції/Розробка вебдодатків з використанням технології ASP.NET Core/WebApp/Views/About/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWJvdXRcSW5kZXguY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Анютка/Desktop/лекції/Розробка вебдодатків з використанням технології ASP.NET Core/WebApp/Views/About/Thanks.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWJvdXRcVGhhbmtzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Анютка/Desktop/лекції/Розробка вебдодатків з використанням технології ASP.NET Core/WebApp/Views/Blog/BlogDetailIndex.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQmxvZ1xCbG9nRGV0YWlsSW5kZXguY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Анютка/Desktop/лекції/Розробка вебдодатків з використанням технології ASP.NET Core/WebApp/Views/Blog/BlogGridIndex.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQmxvZ1xCbG9nR3JpZEluZGV4LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Анютка/Desktop/лекції/Розробка вебдодатків з використанням технології ASP.NET Core/WebApp/Views/Home/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxJbmRleC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Анютка/Desktop/лекції/Розробка вебдодатків з використанням технології ASP.NET Core/WebApp/Views/Pages/FreeQuote.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUGFnZXNcRnJlZVF1b3RlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Анютка/Desktop/лекції/Розробка вебдодатків з використанням технології ASP.NET Core/WebApp/Views/Pages/OurFeatures.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUGFnZXNcT3VyRmVhdHVyZXMuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Анютка/Desktop/лекції/Розробка вебдодатків з використанням технології ASP.NET Core/WebApp/Views/Pages/PricingPlan.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUGFnZXNcUHJpY2luZ1BsYW4uY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Анютка/Desktop/лекції/Розробка вебдодатків з використанням технології ASP.NET Core/WebApp/Views/Pages/TeamMembers.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUGFnZXNcVGVhbU1lbWJlcnMuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Анютка/Desktop/лекції/Розробка вебдодатків з використанням технології ASP.NET Core/WebApp/Views/Pages/Testimonial.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUGFnZXNcVGVzdGltb25pYWwuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Анютка/Desktop/лекції/Розробка вебдодатків з використанням технології ASP.NET Core/WebApp/Views/Services/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2VydmljZXNcSW5kZXguY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Анютка/Desktop/лекції/Розробка вебдодатків з використанням технології ASP.NET Core/WebApp/Views/Shared/Components/Download/Download.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXENvbXBvbmVudHNcRG93bmxvYWRcRG93bmxvYWQuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Анютка/Desktop/лекції/Розробка вебдодатків з використанням технології ASP.NET Core/WebApp/Views/Shared/Components/FooterAbout/FooterAbout.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXENvbXBvbmVudHNcRm9vdGVyQWJvdXRcRm9vdGVyQWJvdXQuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Анютка/Desktop/лекції/Розробка вебдодатків з використанням технології ASP.NET Core/WebApp/Views/Shared/Components/FooterGetInTouch/FooterGetInTouch.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXENvbXBvbmVudHNcRm9vdGVyR2V0SW5Ub3VjaFxGb290ZXJHZXRJblRvdWNoLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Анютка/Desktop/лекції/Розробка вебдодатків з використанням технології ASP.NET Core/WebApp/Views/Shared/Components/FooterLink/FooterLinks.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXENvbXBvbmVudHNcRm9vdGVyTGlua1xGb290ZXJMaW5rcy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Анютка/Desktop/лекції/Розробка вебдодатків з використанням технології ASP.NET Core/WebApp/Views/Shared/Components/FooterQuickLinks/FooterQuickLinks.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXENvbXBvbmVudHNcRm9vdGVyUXVpY2tMaW5rc1xGb290ZXJRdWlja0xpbmtzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Анютка/Desktop/лекції/Розробка вебдодатків з використанням технології ASP.NET Core/WebApp/Views/Shared/Components/FooterRomanSite/FooterRomanSite.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXENvbXBvbmVudHNcRm9vdGVyUm9tYW5TaXRlXEZvb3RlclJvbWFuU2l0ZS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Анютка/Desktop/лекції/Розробка вебдодатків з використанням технології ASP.NET Core/WebApp/Views/Shared/Components/Logo/Logo.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXENvbXBvbmVudHNcTG9nb1xMb2dvLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Анютка/Desktop/лекції/Розробка вебдодатків з використанням технології ASP.NET Core/WebApp/Views/Shared/Components/NavigationMenu/NavigationMenu.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXENvbXBvbmVudHNcTmF2aWdhdGlvbk1lbnVcTmF2aWdhdGlvbk1lbnUuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Анютка/Desktop/лекції/Розробка вебдодатків з використанням технології ASP.NET Core/WebApp/Views/Shared/Components/TopBar/TopBar.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXENvbXBvbmVudHNcVG9wQmFyXFRvcEJhci5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Анютка/Desktop/лекції/Розробка вебдодатків з використанням технології ASP.NET Core/WebApp/Views/Shared/Components/TopSearch/TopSearch.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXENvbXBvbmVudHNcVG9wU2VhcmNoXFRvcFNlYXJjaC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Анютка/Desktop/лекції/Розробка вебдодатків з використанням технології ASP.NET Core/WebApp/Views/Shared/Error.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXEVycm9yLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Анютка/Desktop/лекції/Розробка вебдодатків з використанням технології ASP.NET Core/WebApp/Views/Shared/_ValidationScriptsPartial.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9WYWxpZGF0aW9uU2NyaXB0c1BhcnRpYWwuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Анютка/Desktop/лекції/Розробка вебдодатків з використанням технології ASP.NET Core/WebApp/Views/_ViewImports.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcX1ZpZXdJbXBvcnRzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Анютка/Desktop/лекції/Розробка вебдодатків з використанням технології ASP.NET Core/WebApp/Views/_ViewStart.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcX1ZpZXdTdGFydC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Анютка/Desktop/лекції/Розробка вебдодатків з використанням технології ASP.NET Core/WebApp/Views/Shared/_Layout.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9MYXlvdXQuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = b-7882z672yd
