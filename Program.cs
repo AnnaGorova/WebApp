@@ -16,6 +16,7 @@ namespace WebApp
             builder.Services.AddDbContext<AgencyDBContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("AgencyDBConnection")));
 
             builder.Services.AddScoped<OptionModels>();
+            builder.Services.AddScoped<TagModel>();
 
             var app = builder.Build();
 
