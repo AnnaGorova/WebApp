@@ -29,12 +29,17 @@
                                 <div class="blog-img position-relative overflow-hidden">
                                     <img class="img-fluid" src="@post.ImageSrc" alt="@post.Name">
                                     @if (post.PostCategories.Any())
-
                                     {
-                                        <a class="position-absolute top-0 start-0 bg-primary text-white rounded-end mt-5 py-2 px-4" href="">
-                                            @post.PostCategories.First().Category.Name
+                                        var primaryCategory = post.PostCategories
+                                        .OrderBy(pc => pc.Category.Name == "Microservices" ? 0 : 1)
+                                        .First().Category;
+                                        <a class="position-absolute top-0 start-0 bg-primary text-white rounded-end mt-5 py-2 px-4"
+                                           href="@Url.Action("Category", "Blog", new { categoryId = primaryCategory.Id })">
+                                            @primaryCategory.Name
                                         </a>
                                     }
+                                
+}
                                 </div>
                                 <div class="p-4">
                                     <div class="d-flex mb-3">
@@ -43,7 +48,7 @@
                                     </div>
                                     <h4 class="mb-3">@post.Name</h4>
                                     <p>@post.Description</p>
-                                    <a class="text-uppercase" href="@Url.Action("BlogDetail", "Blog", new { id = post.Id })">
+                                    <a class="text-uppercase" href="@Url.Action("BlogDetailIndex", "Blog", new { id = post.Id })">
                                         Read More <i class="bi bi-arrow-right"></i>
                                     </a>
                                 </div>
@@ -117,13 +122,17 @@
               
                 
                 <!-- Search Form Start -->
-                @* <div class="mb-5 wow slideInUp" data-wow-delay="0.1s">
-                    <div class="input-group">
-                        <input type="text" class="form-control p-3" placeholder="Keyword">
-                        <button class="btn btn-primary px-4"><i class="bi bi-search"></i></button>
-                    </div>
-                </div>-->*@
-                <!-- Search Form End 
+                <div class="mb-5 wow slideInUp" data-wow-delay="0.1s">
+                    <form method="get" action="@Url.Action("Search", "Blog")">
+                        <div class="input-group">
+                            <input type="text" name="keyword" class="form-control p-3" placeholder="Keyword" required>
+                            <button type="submit" class="btn btn-primary px-4">
+                                <i class="bi bi-search"></i>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                <!-- Search Form End -->
 
 
                 <!-- Category Start -->
@@ -132,10 +141,11 @@
                         <h3 class="mb-0">Categories</h3>
                     </div>
                     <div class="link-animated d-flex flex-column justify-content-start">
-                        @foreach (var category in Model.Categories.Take(5))
+                       @foreach (var category in Model.Categories.Take(5))
 
                         {
-                            <a class="h5 fw-semi-bold bg-light rounded py-2 px-3 mb-2" href="#">
+                            <a class="h5 fw-semi-bold bg-light rounded py-2 px-3 mb-2"
+                               href="@Url.Action("Category", "Blog", new { categoryId = category.Id })">
                                 <i class="bi bi-arrow-right me-2"></i>@category.Name
                             </a>
                         }
@@ -147,12 +157,12 @@
                     <div class="section-title section-title-sm position-relative pb-3 mb-4">
                         <h3 class="mb-0">Recent Posts</h3>
                     </div>
-                    @foreach (var post in Model.Posts.Take(5))
+                    @foreach (var post in Model.RecentPosts)
 
                     {
                         <div class="d-flex rounded overflow-hidden mb-3">
                             <img class="img-fluid" src="@post.ImageSrc" style="width: 100px; height: 100px; object-fit: cover;" alt="@post.Name">
-                            <a href="@Url.Action("BlogDetail", "Blog", new { id = post.Id })" class="h5 fw-semi-bold d-flex align-items-center bg-light px-3 mb-0">
+                            <a href="@Url.Action("BlogDetailIndex", "Blog", new { id = post.Id })" class="h5 fw-semi-bold d-flex align-items-center bg-light px-3 mb-0">
                                 @post.Name
                             </a>
                         </div>
@@ -165,10 +175,20 @@
                         <h3 class="mb-0">Tag Cloud</h3>
                     </div>
                     <div class="d-flex flex-wrap m-n1">
-                        @foreach (var tag in Model.Tags.Take(12))
+                        @{
+                            // Отримуємо всі теги з постів поточної сторінки
+                            var currentPageTags = Model.Posts
+                            .SelectMany(p => p.PostTags)
+                            .Select(pt => pt.Tag) //бере самі теги (а не зв'язки)
+                            .Distinct() //видаляє дублікати
+                            .Take(12) //обмежує до 12 тегів
+                            .ToList();
+                        }
 
+                        @foreach (var tag in currentPageTags)
                         {
-                            <a href="" class="btn btn-light m-1">@tag.Name</a>
+                            <a href="@Url.Action("Tag", "Blog", new { tagId = tag.Id })"
+                               class="btn btn-light m-1">@tag.Name</a>
                         }
                     </div>
                 </div>

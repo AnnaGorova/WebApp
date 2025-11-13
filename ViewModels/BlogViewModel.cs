@@ -10,6 +10,7 @@ namespace WebApp.ViewModels
 
         public IEnumerable<Post> Posts { get; set; } = new List<Post>();
 
+        public IEnumerable<Post> RecentPosts { get; set; } = new List<Post>();
         public Post? CurrentPost { get; set; }
 
 
@@ -18,5 +19,7 @@ namespace WebApp.ViewModels
         public int CurrentPage { get; set; }
         public int TotalPages { get; set; }
         public string CurrentCategory { get; set; }
+
+        public string CurrentTag { get; set; }
     }
 }
