@@ -18,6 +18,16 @@
 
 <!-- Blog Start -->
 <div class="container-fluid py-5 wow fadeInUp" data-wow-delay="0.1s">
+    @if (Model != null && Model.Posts != null && Model.Posts.Any())
+
+    {
+
+        var post = Model.Posts.First();
+        <!-- Додаємо приховані поля для AJAX -->
+        <input type="hidden" id="postId" value="@post.Id" />
+        <input type="hidden" id="postSlug" value="@post.Slug" />
+    }
+    
     <div class="container py-5">
         <div class="row g-5">
             <div class="col-lg-8">
@@ -73,69 +83,309 @@
                     <!-- Blog Detail End -->
                     <!-- Comment List Start -->
                     <div class="mb-5">
+                                                
                         <div class="section-title section-title-sm position-relative pb-3 mb-4">
-                            <h3 class="mb-0">3 Comments</h3>
+                            <h3 class="mb-0">Comments</h3>
                         </div>
-                        <div class="d-flex mb-4">
-                            <img src="~/img/user.jpg" class="img-fluid rounded" style="width: 45px; height: 45px;">
-                            <div class="ps-3">
-                                <h6><a href="">John Doe</a> <small><i>01 Jan 2045</i></small></h6>
-                                <p>
-                                    Diam amet duo labore stet elitr invidunt ea clita ipsum voluptua, tempor labore
-                                    accusam ipsum et no at. Kasd diam tempor rebum magna dolores sed eirmod
-                                </p>
-                                <button class="btn btn-sm btn-light">Reply</button>
-                            </div>
-                        </div>
-                        <div class="d-flex mb-4">
-                            <img src="~/img/user.jpg" class="img-fluid rounded" style="width: 45px; height: 45px;">
-                            <div class="ps-3">
-                                <h6><a href="">John Doe</a> <small><i>01 Jan 2045</i></small></h6>
-                                <p>
-                                    Diam amet duo labore stet elitr invidunt ea clita ipsum voluptua, tempor labore
-                                    accusam ipsum et no at. Kasd diam tempor rebum magna dolores sed eirmod
-                                </p>
-                                <button class="btn btn-sm btn-light">Reply</button>
-                            </div>
-                        </div>
-                        <div class="d-flex ms-5 mb-4">
-                            <img src="~/img/user.jpg" class="img-fluid rounded" style="width: 45px; height: 45px;">
-                            <div class="ps-3">
-                                <h6><a href="">John Doe</a> <small><i>01 Jan 2045</i></small></h6>
-                                <p>
-                                    Diam amet duo labore stet elitr invidunt ea clita ipsum voluptua, tempor labore
-                                    accusam ipsum et no at. Kasd diam tempor rebum magna dolores sed eirmod
-                                </p>
-                                <button class="btn btn-sm btn-light">Reply</button>
-                            </div>
+                        <div id="commentsContainer">
+                            <p>Loading comments...</p>
                         </div>
                     </div>
+                    <script>
+                        // Глобальні змінні для відстеження стану
+                        let currentReplyTo = null;
+
+                        // Чекаємо поки DOM завантажиться
+                        document.addEventListener('DOMContentLoaded', function () {
+                            loadComments();
+                            initializeCommentForm();
+                        });
+
+                        function loadComments() {
+                            try {
+                                var slugElement = document.getElementById('postSlug');
+                                if (!slugElement) {
+                                    throw new Error('postSlug element not found');
+                                }
+
+                                var slug = slugElement.value;
+                                
+
+                                if (!slug) {
+                                    throw new Error('Slug is empty');
+                                }
+
+                                var container = document.getElementById('commentsContainer');
+                                if (container) container.innerHTML = '<p style="color: blue;">🔄 Loading comments from API...</p>';
+
+                                // Використовуємо fetch API (без jQuery)
+                                fetch('/Ajax/GetAllComments?slug=' + encodeURIComponent(slug))
+                                    .then(function (response) {
+                                        if (!response.ok) {
+                                            throw new Error('Network error: ' + response.status);
+                                        }
+                                        return response.json();
+                                    })
+                                    .then(function (data) {
+                                        
+                                        if (data.Code === 200) {
+                                            var comments = JSON.parse(data.Data);
+                                            console.log('📝 Comments loaded:', comments.length);
+                                            displayComments(comments);
+                                        } else {
+                                            throw new Error('API error: ' + data.Message);
+                                        }
+                                    })
+                                    .catch(function (error) {
+                                        if (container) container.innerHTML = '<p style="color: red;">❌ Error: ' + error.message + '</p>';
+                                    });
+
+                            } catch (error) {
+                                console.error('❌ Error:', error);
+                                var container = document.getElementById('commentsContainer');
+                                if (container) container.innerHTML = '<p style="color: red;">❌ Error: ' + error.message + '</p>';
+                            }
+                        }
+
+                        function displayComments(comments) {
+                            var container = document.getElementById('commentsContainer');
+
+                            if (!comments || comments.length === 0) {
+                                container.innerHTML = '<p>No comments yet. Be the first to comment!</p>';
+                                return;
+                            }
+
+                            var html = '<h4 class="mb-4">Comments</h4>';
+
+                            // Групуємо коментарі по рівнях
+                            var commentsByLevel = {};
+                            comments.forEach(function (comment) {
+                                if (!commentsByLevel[comment.Level]) {
+                                    commentsByLevel[comment.Level] = [];
+                                }
+                                commentsByLevel[comment.Level].push(comment);
+                            });
+
+                           
+
+                            // Відображаємо коментарі з правильним вкладенням
+                            comments.forEach(function (comment) {
+                                var margin = comment.Level * 40; // Відступ залежить від рівня
+                                var borderClass = comment.Level > 0 ? 'border-start border-3 ps-3' : '';
+                                var replyIndicator = comment.Level > 0 ? '<small class="text-primary ms-2">↳ reply</small>' : '';
+
+                                html += `
+                                        <div class="d-flex mb-4 ${borderClass}" style="margin-left: ${margin}px;">
+                                            <img src="/img/user.jpg" class="rounded me-3" style="width: 45px; height: 45px;">
+                                            <div class="flex-grow-1">
+                                                <div class="d-flex justify-content-between align-items-start">
+                                                    <h6 class="mb-1">${comment.UserLogin}</h6>
+                                                    <button class="btn btn-outline-primary btn-sm reply-btn"
+                                                            data-comment-id="${comment.Id}"
+                                                            data-user-name="${comment.UserLogin}">
+                                                        <i class="bi bi-reply me-1"></i>Reply
+                                                    </button>
+                                                </div>
+                                                <p class="mb-1">${comment.Text}</p>
+                                                <small class="text-muted">${new Date(comment.DateOfCreated).toLocaleString()}</small>
+                                                ${replyIndicator}
+                                            </div>
+                                        </div>
+                                    `;
+                            });
+
+                            container.innerHTML = html;
+
+                            // Додаємо обробники подій для кнопок Reply
+                            setupReplyButtons();
+                           
+                        }
+
+                        function initializeCommentForm() {
+                            const form = document.getElementById('commentForm');
+
+                            if (!form) {
+                              
+                                return;
+                            }
+
+                            
+
+                            // Обробка відправки форми
+                            form.addEventListener('submit', function (e) {
+                                console.log('🔄 Form submit intercepted, preventing default');
+                                e.preventDefault();
+                                submitComment();
+                            });
+                        }
+
+                        function setupReplyButtons() {
+                            // Додаємо невелику затримку, щоб гарантувати, що кнопки вже відрендерені
+                            setTimeout(() => {
+                                const replyButtons = document.querySelectorAll('.reply-btn');
+                               
+
+                                replyButtons.forEach(button => {
+                                    button.addEventListener('click', function () {
+                                        const commentId = this.getAttribute('data-comment-id');
+                                        const userName = this.getAttribute('data-user-name');
+                                        
+                                        replyToComment(commentId, userName);
+                                    });
+                                });
+                            }, 100);
+                        }
+
+                        function replyToComment(commentId, userName) {
+                            currentReplyTo = commentId;
+
+                            // Оновлюємо UI для показу режиму відповіді
+                            document.getElementById('parentCommentId').value = commentId;
+                            document.getElementById('replyToUser').textContent = userName;
+                            document.getElementById('replyCancel').classList.remove('d-none');
+
+                            // Прокручуємо до форми
+                            document.getElementById('commentForm').scrollIntoView({ behavior: 'smooth' });
+
+                            // Фокусуємося на тексті коментаря
+                            document.getElementById('commentText').focus();
+
+                           
+                        }
+
+                        function cancelReply() {
+                            currentReplyTo = null;
+                            document.getElementById('parentCommentId').value = '';
+                            document.getElementById('replyCancel').classList.add('d-none');
+                            console.log('✅ Reply cancelled');
+                        }
+
+                        function submitComment() {
+                            
+
+                            const submitBtn = document.getElementById('submitComment');
+                            const submitText = document.getElementById('submitText');
+                            const spinner = document.getElementById('submitSpinner');
+
+                            // Показуємо спінер
+                            submitBtn.disabled = true;
+                            submitText.textContent = 'Posting Comment...';
+                            spinner.classList.remove('d-none');
+
+                            const formData = {
+                                userName: document.getElementById('userName').value,
+                                userEmail: document.getElementById('userEmail').value,
+                                commentText: document.getElementById('commentText').value,
+                                parentCommentId: document.getElementById('parentCommentId').value || null,
+                                postSlug: document.getElementById('postSlug').value
+                            };
+
+                           
+
+                            // Відправляємо на сервер
+                            fetch('/Ajax/AddComment', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                },
+                                body: JSON.stringify(formData)
+                            })
+                                .then(response => {
+                                    return response.json();
+                                })
+                                .then(data => {
+                                    
+                                    if (data.Code === 200) {
+                                        // Очищаємо форму
+                                        document.getElementById('commentForm').reset();
+                                        cancelReply();
+
+                                        // Показуємо повідомлення про успіх
+                                        showAlert('Comment added successfully!', 'success');
+
+                                        // Перезавантажуємо коментарі
+                                        setTimeout(() => {
+                                            loadComments();
+                                        }, 1000);
+                                    } else {
+                                        showAlert('Error: ' + data.Message, 'error');
+                                    }
+                                })
+                                .catch(error => {
+                                    showAlert('Network error. Please try again.', 'error');
+                                })
+                                .finally(() => {
+                                    // Ховаємо спінер
+                                    submitBtn.disabled = false;
+                                    submitText.textContent = 'Leave Your Comment';
+                                    spinner.classList.add('d-none');
+                                });
+                        }
+
+                        // Функція для показу сповіщень
+                        function showAlert(message, type) {
+                            const alertDiv = document.createElement('div');
+                            alertDiv.className = `alert alert-${type === 'success' ? 'success' : 'danger'} alert-dismissible fade show`;
+                            alertDiv.innerHTML = `
+                                    ${message}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                `;
+
+                            document.querySelector('.bg-light.rounded.p-5').prepend(alertDiv);
+
+                            // Автоматично ховаємо через 5 секунд
+                            setTimeout(() => {
+                                if (alertDiv.parentElement) {
+                                    alertDiv.remove();
+                                }
+                            }, 5000);
+                        }
+                    </script>
                     <!-- Comment List End -->
                     <!-- Comment Form Start -->
                     <div class="bg-light rounded p-5">
                         <div class="section-title section-title-sm position-relative pb-3 mb-4">
                             <h3 class="mb-0">Leave A Comment</h3>
                         </div>
-                        <form>
+                        <form id="commentForm">
+                            <input type="hidden" id="parentCommentId" name="parentCommentId" value="">
+                            <input type="hidden" id="postSlug" value="@Model.Posts.First().Slug">
+
                             <div class="row g-3">
                                 <div class="col-12 col-sm-6">
-                                    <input type="text" class="form-control bg-white border-0" placeholder="Your Name" style="height: 55px;">
+                                    <input type="text" id="userName" name="userName" class="form-control bg-white border-0"
+                                           placeholder="Your Name" style="height: 55px;" required>
+                                    <div class="invalid-feedback">Please enter your name.</div>
                                 </div>
                                 <div class="col-12 col-sm-6">
-                                    <input type="email" class="form-control bg-white border-0" placeholder="Your Email" style="height: 55px;">
+                                    <input type="email" id="userEmail" name="userEmail" class="form-control bg-white border-0"
+                                           placeholder="Your Email" style="height: 55px;">
                                 </div>
                                 <div class="col-12">
-                                    <input type="text" class="form-control bg-white border-0" placeholder="Website" style="height: 55px;">
+                                    <textarea id="commentText" name="commentText" class="form-control bg-white border-0"
+                                              rows="5" placeholder="Your Comment" required></textarea>
+                                    <div class="invalid-feedback">Please enter your comment.</div>
                                 </div>
                                 <div class="col-12">
-                                    <textarea class="form-control bg-white border-0" rows="5" placeholder="Comment"></textarea>
-                                </div>
-                                <div class="col-12">
-                                    <button class="btn btn-primary w-100 py-3" type="submit">Leave Your Comment</button>
+                                    <button type="submit" class="btn btn-primary w-100 py-3" id="submitComment">
+                                        <span id="submitText">Leave Your Comment</span>
+                                        <div id="submitSpinner" class="spinner-border spinner-border-sm ms-2 d-none" role="status">
+                                            <span class="visually-hidden">Loading...</span>
+                                        </div>
+                                    </button>
                                 </div>
                             </div>
                         </form>
+
+                        <!-- Кнопка скасування відповіді -->
+                        <div id="replyCancel" class="mt-3 d-none">
+                            <button type="button" class="btn btn-outline-secondary btn-sm" onclick="cancelReply()">
+                                <i class="bi bi-x-circle me-1"></i>Cancel Reply
+                            </button>
+                            <small class="text-muted ms-2">Replying to: <span id="replyToUser"></span></small>
+                        </div>
                     </div>
+                  
                     <!-- Comment Form End -->
                 }
 

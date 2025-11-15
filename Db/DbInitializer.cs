@@ -1,4 +1,5 @@
-﻿using WebApp.Entities;
+﻿using Microsoft.EntityFrameworkCore;
+using WebApp.Entities;
 
 namespace WebApp.Db
 {
@@ -831,227 +832,239 @@ namespace WebApp.Db
             }
         }
 
-        /// <summary>
-        /// Заповнюємо таблицю Comments початковими даними.
-        /// </summary>
+
+
+
         private static void SeedComments(AgencyDBContext context)
         {
             if (!context.Comments.Any())
             {
-                var firstPost = context.Posts.FirstOrDefault(p => p.PostStatuses == PostStatuses.Published);
+                var posts = context.Posts.ToList();
+                var allComments = new List<Comment>();
+                var commentId = 1;
 
-                if (firstPost == null)
+                foreach (var post in posts)
                 {
-                    Console.WriteLine("❌ No published posts found for comments");
-                    return; // Це зупиняє виконання методу!
+                    // ==== РІВЕНЬ 1: Кореневі коментарі ====
+                    var rootComments = new List<Comment>
+            {
+                new Comment {
+                    Id = commentId++,
+                    UserLogin = "alex",
+                    UserEmail = "alex@mail.com",
+                    UserAvatar = "avatar1.png",
+                    Text = "Дуже цікава стаття про " + post.Name + "!",
+                    DateOfCreated = DateTime.Now.AddMinutes(-200),
+                    PostId = post.Id, // ✅ Використовуємо ID поточного поста
+                    ParentCommentId = null,
+                    IsRequired = true
+                },
+                new Comment {
+                    Id = commentId++,
+                    UserLogin = "maria",
+                    UserEmail = "maria@mail.com",
+                    UserAvatar = "avatar2.png",
+                    Text = "Повністю погоджуюсь з автором статті!",
+                    DateOfCreated = DateTime.Now.AddMinutes(-180),
+                    PostId = post.Id, // ✅ Використовуємо ID поточного поста
+                    ParentCommentId = null,
+                    IsRequired = true
+                },
+                new Comment {
+                    Id = commentId++,
+                    UserLogin = "john",
+                    UserEmail = "john@mail.com",
+                    UserAvatar = "avatar3.png",
+                    Text = "Маю кілька зауважень щодо цієї теми.",
+                    DateOfCreated = DateTime.Now.AddMinutes(-150),
+                    PostId = post.Id, // ✅ Використовуємо ID поточного поста
+                    ParentCommentId = null,
+                    IsRequired = true
+                },
+                new Comment {
+                    Id = commentId++,
+                    UserLogin = "olga",
+                    UserEmail = "olga@mail.com",
+                    UserAvatar = "avatar4.png",
+                    Text = "Чи можете ви розповісти більше про " + post.Name + "?",
+                    DateOfCreated = DateTime.Now.AddMinutes(-120),
+                    PostId = post.Id, // ✅ Використовуємо ID поточного поста
+                    ParentCommentId = null,
+                    IsRequired = true
+                }
+            };
+
+                    // ==== РІВЕНЬ 2: Відповіді на кореневі коментарі ====
+                    var level2Comments = new List<Comment>
+            {
+                // Відповіді на коментар alex
+                new Comment {
+                    Id = commentId++,
+                    UserLogin = "kate",
+                    UserEmail = "kate@mail.com",
+                    UserAvatar = "avatar5.png",
+                    Text = "Так, я теж знайшла багато корисного в цій статті!",
+                    DateOfCreated = DateTime.Now.AddMinutes(-170),
+                    PostId = post.Id,
+                    ParentCommentId = rootComments[0].Id, // Відповідь на alex
+                    IsRequired = true
+                },
+                new Comment {
+                    Id = commentId++,
+                    UserLogin = "max",
+                    UserEmail = "max@mail.com",
+                    UserAvatar = "avatar6.png",
+                    Text = "Особливо сподобалася практична частина.",
+                    DateOfCreated = DateTime.Now.AddMinutes(-160),
+                    PostId = post.Id,
+                    ParentCommentId = rootComments[0].Id, // Відповідь на alex
+                    IsRequired = true
+                },
+
+                // Відповіді на коментар maria
+                new Comment {
+                    Id = commentId++,
+                    UserLogin = "igor",
+                    UserEmail = "igor@mail.com",
+                    UserAvatar = "avatar7.png",
+                    Text = "Я також повністю згоден з Марією!",
+                    DateOfCreated = DateTime.Now.AddMinutes(-140),
+                    PostId = post.Id,
+                    ParentCommentId = rootComments[1].Id, // Відповідь на maria
+                    IsRequired = true
+                },
+
+                // Відповіді на коментар john
+                new Comment {
+                    Id = commentId++,
+                    UserLogin = "anna",
+                    UserEmail = "anna@mail.com",
+                    UserAvatar = "avatar8.png",
+                    Text = "Які саме зауваження у вас є? Мені цікаво почути.",
+                    DateOfCreated = DateTime.Now.AddMinutes(-130),
+                    PostId = post.Id,
+                    ParentCommentId = rootComments[2].Id, // Відповідь на john
+                    IsRequired = true
+                },
+                new Comment {
+                    Id = commentId++,
+                    UserLogin = "artem",
+                    UserEmail = "artem@mail.com",
+                    UserAvatar = "avatar9.png",
+                    Text = "Дійсно, є кілька суперечливих моментів.",
+                    DateOfCreated = DateTime.Now.AddMinutes(-125),
+                    PostId = post.Id,
+                    ParentCommentId = rootComments[2].Id, // Відповідь на john
+                    IsRequired = true
+                },
+
+                // Відповіді на коментар olga
+                new Comment {
+                    Id = commentId++,
+                    UserLogin = "sergiy",
+                    UserEmail = "sergiy@mail.com",
+                    UserAvatar = "avatar10.png",
+                    Text = "Я можу допомогти з додатковою інформацією!",
+                    DateOfCreated = DateTime.Now.AddMinutes(-110),
+                    PostId = post.Id,
+                    ParentCommentId = rootComments[3].Id, // Відповідь на olga
+                    IsRequired = true
+                }
+            };
+
+                    // ==== РІВЕНЬ 3: Відповіді на відповіді ====
+                    var level3Comments = new List<Comment>
+            {
+                // Відповідь на відповідь kate
+                new Comment {
+                    Id = commentId++,
+                    UserLogin = "natalia",
+                    UserEmail = "natalia@mail.com",
+                    UserAvatar = "avatar11.png",
+                    Text = "Кате, яка частина була найкориснішою для вас?",
+                    DateOfCreated = DateTime.Now.AddMinutes(-155),
+                    PostId = post.Id,
+                    ParentCommentId = level2Comments[0].Id, // Відповідь на kate
+                    IsRequired = true
+                },
+
+                // Відповідь на відповідь anna
+                new Comment {
+                    Id = commentId++,
+                    UserLogin = "john", // Той самий john відповідає
+                    UserEmail = "john@mail.com",
+                    UserAvatar = "avatar3.png",
+                    Text = "Анно, звичайно! Мені здається, що автор недооцінив важливість...",
+                    DateOfCreated = DateTime.Now.AddMinutes(-120),
+                    PostId = post.Id,
+                    ParentCommentId = level2Comments[3].Id, // Відповідь на anna
+                    IsRequired = true
+                },
+
+                // Відповідь на відповідь artem
+                new Comment {
+                    Id = commentId++,
+                    UserLogin = "viktor",
+                    UserEmail = "viktor@mail.com",
+                    UserAvatar = "avatar12.png",
+                    Text = "Артеме, які саме моменти ви вважаєте суперечливими?",
+                    DateOfCreated = DateTime.Now.AddMinutes(-115),
+                    PostId = post.Id,
+                    ParentCommentId = level2Comments[4].Id, // Відповідь на artem
+                    IsRequired = true
+                }
+            };
+
+                    // ==== РІВЕНЬ 4: Глибша вкладеність ====
+                    var level4Comments = new List<Comment>
+            {
+                // Відповідь на відповідь natalia
+                new Comment {
+                    Id = commentId++,
+                    UserLogin = "kate", // Той самий kate відповідає
+                    UserEmail = "kate@mail.com",
+                    UserAvatar = "avatar5.png",
+                    Text = "Наталіє, мені найбільше сподобався розділ про впровадження на практиці!",
+                    DateOfCreated = DateTime.Now.AddMinutes(-145),
+                    PostId = post.Id,
+                    ParentCommentId = level3Comments[0].Id, // Відповідь на natalia
+                    IsRequired = true
+                },
+
+                // Відповідь на відповідь john
+                new Comment {
+                    Id = commentId++,
+                    UserLogin = "artem",
+                    UserEmail = "artem@mail.com",
+                    UserAvatar = "avatar9.png",
+                    Text = "Джоне, я згоден з твоїми зауваженнями! Особливо щодо масштабованості.",
+                    DateOfCreated = DateTime.Now.AddMinutes(-115),
+                    PostId = post.Id,
+                    ParentCommentId = level3Comments[1].Id, // Відповідь на john (рівень 3)
+                    IsRequired = true
+                }
+            };
+
+                    // Додаємо всі коментарі поста до загального списку
+                    allComments.AddRange(rootComments);
+                    allComments.AddRange(level2Comments);
+                    allComments.AddRange(level3Comments);
+                    allComments.AddRange(level4Comments);
                 }
 
-                context.Comments.AddRange(
-                  new Comment
-                  {
-                      UserLogin = "JohnDoe",
-                      UserEmail = "john@example.com",
-                      UserAvatar = "/img/user.jpg", // Використовуйте існуючі зображення
-                      Text = "Great article! Very helpful for beginners.",
-                      DateOfCreated = DateTime.Now.AddDays(-2),
-                      IsRequired = true,
-                      PostId = firstPost.Id
-                  },
-                    new Comment
-                    {
-                        UserLogin = "JaneSmith",
-                        UserEmail = "jane@example.com",
-                        UserAvatar = "/img/user.jpg",
-                        Text = "Thanks for the detailed explanation.",
-                        DateOfCreated = DateTime.Now.AddDays(-1),
-                        IsRequired = true,
-                        PostId = firstPost.Id
-                    },
-                    new Comment
-                    {
-                        UserLogin = "DevGuru",
-                        UserEmail = "dev@example.com",
-                        UserAvatar = "/img/user.jpg",
-                        Text = "Could you provide more examples?",
-                        DateOfCreated = DateTime.Now.AddHours(-12),
-                        IsRequired = false,
-                        PostId = firstPost.Id
-                    },
-                    new Comment
-                    {
-                        UserLogin = "CodeMaster",
-                        UserEmail = "code@example.com",
-                        UserAvatar = "/img/user.jpg",
-                        Text = "This solved my problem, thank you!",
-                        DateOfCreated = DateTime.Now.AddHours(-6),
-                        IsRequired = true,
-                        PostId = firstPost.Id
-                    },
-                    new Comment
-                    {
-                        UserLogin = "WebDeveloper",
-                        UserEmail = "web@example.com",
-                        UserAvatar = "/img/user.jpg",
-                        Text = "Looking forward to more tutorials like this.",
-                        DateOfCreated = DateTime.Now.AddHours(-3),
-                        IsRequired = true,
-                        PostId = firstPost.Id
-                    },
-                    new Comment
-                    {
-                        UserLogin = "TechEnthusiast",
-                        UserEmail = "tech@example.com",
-                        UserAvatar = "/img/user.jpg",
-                        Text = "Excellent post! The examples were very clear and easy to follow.",
-                        DateOfCreated = DateTime.Now.AddDays(-3),
-                        IsRequired = true,
-                        PostId = firstPost.Id
-                    },
-                    new Comment
-                    {
-                        UserLogin = "CodeNewbie",
-                        UserEmail = "newbie@example.com",
-                        UserAvatar = "/img/user.jpg",
-                        Text = "As a beginner, this was exactly what I needed. Thank you!",
-                        DateOfCreated = DateTime.Now.AddDays(-4),
-                        IsRequired = true,
-                        PostId = firstPost.Id
-                    },
-                    new Comment
-                    {
-                        UserLogin = "SeniorDev",
-                        UserEmail = "senior@example.com",
-                        UserAvatar = "/img/user.jpg",
-                        Text = "Good overview, but I think you missed some advanced scenarios.",
-                        DateOfCreated = DateTime.Now.AddDays(-1),
-                        IsRequired = false,
-                        PostId = firstPost.Id
-                    },
-                    new Comment
-                    {
-                        UserLogin = "DesignerPro",
-                        UserEmail = "design@example.com",
-                        UserAvatar = "/img/user.jpg",
-                        Text = "The UI examples were particularly helpful. Great work!",
-                        DateOfCreated = DateTime.Now.AddHours(-18),
-                        IsRequired = true,
-                        PostId = firstPost.Id
-                    },
-                    new Comment
-                    {
-                        UserLogin = "BackendExpert",
-                        UserEmail = "backend@example.com",
-                        UserAvatar = "/img/user.jpg",
-                        Text = "Clean code examples. Appreciate the attention to best practices.",
-                        DateOfCreated = DateTime.Now.AddDays(-2),
-                        IsRequired = true,
-                        PostId = firstPost.Id
-                    },
-                    new Comment
-                    {
-                        UserLogin = "CloudArchitect",
-                        UserEmail = "cloud@example.com",
-                        UserAvatar = "/img/user.jpg",
-                        Text = "Would love to see how this integrates with cloud services.",
-                        DateOfCreated = DateTime.Now.AddHours(-8),
-                        IsRequired = false,
-                        PostId = firstPost.Id
-                    },
-                    new Comment
-                    {
-                        UserLogin = "MobileDev",
-                        UserEmail = "mobile@example.com",
-                        UserAvatar = "/img/user.jpg",
-                        Text = "Any plans for a mobile version of this tutorial?",
-                        DateOfCreated = DateTime.Now.AddDays(-5),
-                        IsRequired = false,
-                        PostId = firstPost.Id
-                    },
-                    new Comment
-                    {
-                        UserLogin = "OpenSourceFan",
-                        UserEmail = "opensource@example.com",
-                        UserAvatar = "/img/user.jpg",
-                        Text = "Love that you used open source tools in your examples!",
-                        DateOfCreated = DateTime.Now.AddHours(-24),
-                        IsRequired = true,
-                        PostId = firstPost.Id
-                    },
-                    new Comment
-                    {
-                        UserLogin = "TeamLead",
-                        UserEmail = "lead@example.com",
-                        UserAvatar = "/img/user.jpg",
-                        Text = "Shared this with my team. Very practical advice.",
-                        DateOfCreated = DateTime.Now.AddDays(-6),
-                        IsRequired = true,
-                        PostId = firstPost.Id
-                    },
-                    new Comment
-                    {
-                        UserLogin = "StudentCoder",
-                        UserEmail = "student@example.com",
-                        UserAvatar = "/img/user.jpg",
-                        Text = "This helped me with my university project. Thanks!",
-                        DateOfCreated = DateTime.Now.AddDays(-7),
-                        IsRequired = true,
-                        PostId = firstPost.Id
-                    },
-                    new Comment
-                    {
-                        UserLogin = "StartupFounder",
-                        UserEmail = "startup@example.com",
-                        UserAvatar = "/img/user.jpg",
-                        Text = "Implementing this in our startup. Great timing!",
-                        DateOfCreated = DateTime.Now.AddHours(-10),
-                        IsRequired = true,
-                        PostId = firstPost.Id
-                    },
-                    new Comment
-                    {
-                        UserLogin = "CodeReviewer",
-                        UserEmail = "review@example.com",
-                        UserAvatar = "/img/user.jpg",
-                        Text = "Minor suggestion: consider adding error handling examples.",
-                        DateOfCreated = DateTime.Now.AddDays(-3),
-                        IsRequired = false,
-                        PostId = firstPost.Id
-                    },
-                    new Comment
-                    {
-                        UserLogin = "DevOpsEngineer",
-                        UserEmail = "devops@example.com",
-                        UserAvatar = "/img/user.jpg",
-                        Text = "How would this work in a CI/CD pipeline?",
-                        DateOfCreated = DateTime.Now.AddHours(-15),
-                        IsRequired = false,
-                        PostId = firstPost.Id
-                    },
-                    new Comment
-                    {
-                        UserLogin = "Freelancer",
-                        UserEmail = "freelance@example.com",
-                        UserAvatar = "/img/user.jpg",
-                        Text = "Used this on a client project - worked perfectly!",
-                        DateOfCreated = DateTime.Now.AddDays(-8),
-                        IsRequired = true,
-                        PostId = firstPost.Id
-                    },
-                    new Comment
-                    {
-                        UserLogin = "TechBlogger",
-                        UserEmail = "blogger@example.com",
-                        UserAvatar = "/img/user.jpg",
-                        Text = "Inspired me to write about this topic on my own blog. Great content!",
-                        DateOfCreated = DateTime.Now.AddHours(-20),
-                        IsRequired = true,
-                        PostId = firstPost.Id
-                    }
-                );
+                // Зберігаємо всі коментарі в базу
+                context.Database.OpenConnection();
+                context.Database.ExecuteSqlRaw("SET IDENTITY_INSERT Comments ON");
 
-                Console.WriteLine("✅ Comments table seeded successfully");
+                context.Comments.AddRange(allComments);
+                context.SaveChanges();
+
+                context.Database.ExecuteSqlRaw("SET IDENTITY_INSERT Comments OFF");
+                context.Database.CloseConnection();
+
             }
         }
+
 
         /// <summary>
         /// Заповнюємо таблицю PostTags початковими даними.
