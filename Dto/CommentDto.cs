@@ -11,5 +11,6 @@
         public int PostId { get; set; }
         public int? ParentCommentId { get; set; } = null;
         public int Level { get; set; } = 0;
+        public bool IsApproved { get; set; } = false; //  поле для модерації
     }
 }

@@ -833,8 +833,6 @@ namespace WebApp.Db
         }
 
 
-
-
         private static void SeedComments(AgencyDBContext context)
         {
             if (!context.Comments.Any())
@@ -842,6 +840,28 @@ namespace WebApp.Db
                 var posts = context.Posts.ToList();
                 var allComments = new List<Comment>();
                 var commentId = 1;
+
+                // Список унікальних аватарок з сервісу
+                var avatarUrls = new List<string>
+        {
+            "https://i.pravatar.cc/150?img=1",
+            "https://i.pravatar.cc/150?img=2",
+            "https://i.pravatar.cc/150?img=3",
+            "https://i.pravatar.cc/150?img=4",
+            "https://i.pravatar.cc/150?img=5",
+            "https://i.pravatar.cc/150?img=6",
+            "https://i.pravatar.cc/150?img=7",
+            "https://i.pravatar.cc/150?img=8",
+            "https://i.pravatar.cc/150?img=9",
+            "https://i.pravatar.cc/150?img=10",
+            "https://i.pravatar.cc/150?img=11",
+            "https://i.pravatar.cc/150?img=12",
+            "https://i.pravatar.cc/150?img=13",
+            "https://i.pravatar.cc/150?img=14",
+            "https://i.pravatar.cc/150?img=15"
+        };
+
+                var avatarIndex = 0;
 
                 foreach (var post in posts)
                 {
@@ -852,45 +872,50 @@ namespace WebApp.Db
                     Id = commentId++,
                     UserLogin = "alex",
                     UserEmail = "alex@mail.com",
-                    UserAvatar = "avatar1.png",
+                    UserAvatar = avatarUrls[avatarIndex++ % avatarUrls.Count], // ✅ Автоматично вибирає аватарку
                     Text = "Дуже цікава стаття про " + post.Name + "!",
                     DateOfCreated = DateTime.Now.AddMinutes(-200),
-                    PostId = post.Id, // ✅ Використовуємо ID поточного поста
+                    PostId = post.Id,
                     ParentCommentId = null,
-                    IsRequired = true
+                    IsRequired = true,
+                    IsApproved= true // ІСНУЮЧІ КОМЕНТАРІ ВЖЕ СХВАЛЕНІ
                 },
                 new Comment {
                     Id = commentId++,
                     UserLogin = "maria",
                     UserEmail = "maria@mail.com",
-                    UserAvatar = "avatar2.png",
+                    UserAvatar = avatarUrls[avatarIndex++ % avatarUrls.Count], // ✅ Наступна аватарка
                     Text = "Повністю погоджуюсь з автором статті!",
                     DateOfCreated = DateTime.Now.AddMinutes(-180),
-                    PostId = post.Id, // ✅ Використовуємо ID поточного поста
+                    PostId = post.Id,
                     ParentCommentId = null,
-                    IsRequired = true
+                     IsRequired = true,
+                    IsApproved= true // ІСНУЮЧІ КОМЕНТАРІ ВЖЕ СХВАЛЕНІ
+
                 },
                 new Comment {
                     Id = commentId++,
                     UserLogin = "john",
                     UserEmail = "john@mail.com",
-                    UserAvatar = "avatar3.png",
+                    UserAvatar = avatarUrls[avatarIndex++ % avatarUrls.Count], // ✅ Наступна аватарка
                     Text = "Маю кілька зауважень щодо цієї теми.",
                     DateOfCreated = DateTime.Now.AddMinutes(-150),
-                    PostId = post.Id, // ✅ Використовуємо ID поточного поста
+                    PostId = post.Id,
                     ParentCommentId = null,
-                    IsRequired = true
+                    IsRequired = true,
+                    IsApproved= true // ІСНУЮЧІ КОМЕНТАРІ ВЖЕ СХВАЛЕНІ
                 },
                 new Comment {
                     Id = commentId++,
                     UserLogin = "olga",
                     UserEmail = "olga@mail.com",
-                    UserAvatar = "avatar4.png",
+                    UserAvatar = avatarUrls[avatarIndex++ % avatarUrls.Count], // ✅ Наступна аватарка
                     Text = "Чи можете ви розповісти більше про " + post.Name + "?",
                     DateOfCreated = DateTime.Now.AddMinutes(-120),
-                    PostId = post.Id, // ✅ Використовуємо ID поточного поста
+                    PostId = post.Id,
                     ParentCommentId = null,
-                    IsRequired = true
+                    IsRequired = true,
+                    IsApproved= true // ІСНУЮЧІ КОМЕНТАРІ ВЖЕ СХВАЛЕНІ
                 }
             };
 
@@ -902,23 +927,25 @@ namespace WebApp.Db
                     Id = commentId++,
                     UserLogin = "kate",
                     UserEmail = "kate@mail.com",
-                    UserAvatar = "avatar5.png",
+                    UserAvatar = avatarUrls[avatarIndex++ % avatarUrls.Count], // ✅ Наступна аватарка
                     Text = "Так, я теж знайшла багато корисного в цій статті!",
                     DateOfCreated = DateTime.Now.AddMinutes(-170),
                     PostId = post.Id,
-                    ParentCommentId = rootComments[0].Id, // Відповідь на alex
-                    IsRequired = true
+                    ParentCommentId = rootComments[0].Id,
+                    IsRequired = true,
+                    IsApproved= true // ІСНУЮЧІ КОМЕНТАРІ ВЖЕ СХВАЛЕНІ
                 },
                 new Comment {
                     Id = commentId++,
                     UserLogin = "max",
                     UserEmail = "max@mail.com",
-                    UserAvatar = "avatar6.png",
+                    UserAvatar = avatarUrls[avatarIndex++ % avatarUrls.Count], // ✅ Наступна аватарка
                     Text = "Особливо сподобалася практична частина.",
                     DateOfCreated = DateTime.Now.AddMinutes(-160),
                     PostId = post.Id,
-                    ParentCommentId = rootComments[0].Id, // Відповідь на alex
-                    IsRequired = true
+                    ParentCommentId = rootComments[0].Id,
+                    IsRequired = true,
+                    IsApproved= true // ІСНУЮЧІ КОМЕНТАРІ ВЖЕ СХВАЛЕНІ
                 },
 
                 // Відповіді на коментар maria
@@ -926,12 +953,13 @@ namespace WebApp.Db
                     Id = commentId++,
                     UserLogin = "igor",
                     UserEmail = "igor@mail.com",
-                    UserAvatar = "avatar7.png",
+                    UserAvatar = avatarUrls[avatarIndex++ % avatarUrls.Count], // ✅ Наступна аватарка
                     Text = "Я також повністю згоден з Марією!",
                     DateOfCreated = DateTime.Now.AddMinutes(-140),
                     PostId = post.Id,
-                    ParentCommentId = rootComments[1].Id, // Відповідь на maria
-                    IsRequired = true
+                    ParentCommentId = rootComments[1].Id,
+                    IsRequired = true,
+                    IsApproved= true // ІСНУЮЧІ КОМЕНТАРІ ВЖЕ СХВАЛЕНІ
                 },
 
                 // Відповіді на коментар john
@@ -939,23 +967,25 @@ namespace WebApp.Db
                     Id = commentId++,
                     UserLogin = "anna",
                     UserEmail = "anna@mail.com",
-                    UserAvatar = "avatar8.png",
+                    UserAvatar = avatarUrls[avatarIndex++ % avatarUrls.Count], // ✅ Наступна аватарка
                     Text = "Які саме зауваження у вас є? Мені цікаво почути.",
                     DateOfCreated = DateTime.Now.AddMinutes(-130),
                     PostId = post.Id,
-                    ParentCommentId = rootComments[2].Id, // Відповідь на john
-                    IsRequired = true
+                    ParentCommentId = rootComments[2].Id,
+                    IsRequired = true,
+                    IsApproved= true // ІСНУЮЧІ КОМЕНТАРІ ВЖЕ СХВАЛЕНІ
                 },
                 new Comment {
                     Id = commentId++,
                     UserLogin = "artem",
                     UserEmail = "artem@mail.com",
-                    UserAvatar = "avatar9.png",
+                    UserAvatar = avatarUrls[avatarIndex++ % avatarUrls.Count], // ✅ Наступна аватарка
                     Text = "Дійсно, є кілька суперечливих моментів.",
                     DateOfCreated = DateTime.Now.AddMinutes(-125),
                     PostId = post.Id,
-                    ParentCommentId = rootComments[2].Id, // Відповідь на john
-                    IsRequired = true
+                    ParentCommentId = rootComments[2].Id,
+                    IsRequired = true,
+                    IsApproved= true // ІСНУЮЧІ КОМЕНТАРІ ВЖЕ СХВАЛЕНІ
                 },
 
                 // Відповіді на коментар olga
@@ -963,12 +993,13 @@ namespace WebApp.Db
                     Id = commentId++,
                     UserLogin = "sergiy",
                     UserEmail = "sergiy@mail.com",
-                    UserAvatar = "avatar10.png",
+                    UserAvatar = avatarUrls[avatarIndex++ % avatarUrls.Count], // ✅ Наступна аватарка
                     Text = "Я можу допомогти з додатковою інформацією!",
                     DateOfCreated = DateTime.Now.AddMinutes(-110),
                     PostId = post.Id,
-                    ParentCommentId = rootComments[3].Id, // Відповідь на olga
-                    IsRequired = true
+                    ParentCommentId = rootComments[3].Id,
+                    IsRequired = true,
+                    IsApproved= true // ІСНУЮЧІ КОМЕНТАРІ ВЖЕ СХВАЛЕНІ
                 }
             };
 
@@ -980,12 +1011,13 @@ namespace WebApp.Db
                     Id = commentId++,
                     UserLogin = "natalia",
                     UserEmail = "natalia@mail.com",
-                    UserAvatar = "avatar11.png",
+                    UserAvatar = avatarUrls[avatarIndex++ % avatarUrls.Count], // ✅ Наступна аватарка
                     Text = "Кате, яка частина була найкориснішою для вас?",
                     DateOfCreated = DateTime.Now.AddMinutes(-155),
                     PostId = post.Id,
-                    ParentCommentId = level2Comments[0].Id, // Відповідь на kate
-                    IsRequired = true
+                    ParentCommentId = level2Comments[0].Id,
+                    IsRequired = true,
+                    IsApproved= true // ІСНУЮЧІ КОМЕНТАРІ ВЖЕ СХВАЛЕНІ
                 },
 
                 // Відповідь на відповідь anna
@@ -993,12 +1025,13 @@ namespace WebApp.Db
                     Id = commentId++,
                     UserLogin = "john", // Той самий john відповідає
                     UserEmail = "john@mail.com",
-                    UserAvatar = "avatar3.png",
+                    UserAvatar = rootComments[2].UserAvatar, // ✅ Той самий аватар, що й у першого коментаря john
                     Text = "Анно, звичайно! Мені здається, що автор недооцінив важливість...",
                     DateOfCreated = DateTime.Now.AddMinutes(-120),
                     PostId = post.Id,
-                    ParentCommentId = level2Comments[3].Id, // Відповідь на anna
-                    IsRequired = true
+                    ParentCommentId = level2Comments[3].Id,
+                    IsRequired = true,
+                    IsApproved= true // ІСНУЮЧІ КОМЕНТАРІ ВЖЕ СХВАЛЕНІ
                 },
 
                 // Відповідь на відповідь artem
@@ -1006,12 +1039,13 @@ namespace WebApp.Db
                     Id = commentId++,
                     UserLogin = "viktor",
                     UserEmail = "viktor@mail.com",
-                    UserAvatar = "avatar12.png",
+                    UserAvatar = avatarUrls[avatarIndex++ % avatarUrls.Count], // ✅ Наступна аватарка
                     Text = "Артеме, які саме моменти ви вважаєте суперечливими?",
                     DateOfCreated = DateTime.Now.AddMinutes(-115),
                     PostId = post.Id,
-                    ParentCommentId = level2Comments[4].Id, // Відповідь на artem
-                    IsRequired = true
+                    ParentCommentId = level2Comments[4].Id,
+                    IsRequired = true,
+                    IsApproved= true // ІСНУЮЧІ КОМЕНТАРІ ВЖЕ СХВАЛЕНІ
                 }
             };
 
@@ -1023,25 +1057,27 @@ namespace WebApp.Db
                     Id = commentId++,
                     UserLogin = "kate", // Той самий kate відповідає
                     UserEmail = "kate@mail.com",
-                    UserAvatar = "avatar5.png",
+                    UserAvatar = level2Comments[0].UserAvatar, // ✅ Той самий аватар, що й у першого коментаря kate
                     Text = "Наталіє, мені найбільше сподобався розділ про впровадження на практиці!",
                     DateOfCreated = DateTime.Now.AddMinutes(-145),
                     PostId = post.Id,
-                    ParentCommentId = level3Comments[0].Id, // Відповідь на natalia
-                    IsRequired = true
+                    ParentCommentId = level3Comments[0].Id,
+                    IsRequired = true,
+                    IsApproved= true // ІСНУЮЧІ КОМЕНТАРІ ВЖЕ СХВАЛЕНІ
                 },
 
                 // Відповідь на відповідь john
                 new Comment {
                     Id = commentId++,
-                    UserLogin = "artem",
+                    UserLogin = "artem", // Той самий artem відповідає
                     UserEmail = "artem@mail.com",
-                    UserAvatar = "avatar9.png",
+                    UserAvatar = level2Comments[4].UserAvatar, // ✅ Той самий аватар, що й у першого коментаря artem
                     Text = "Джоне, я згоден з твоїми зауваженнями! Особливо щодо масштабованості.",
                     DateOfCreated = DateTime.Now.AddMinutes(-115),
                     PostId = post.Id,
-                    ParentCommentId = level3Comments[1].Id, // Відповідь на john (рівень 3)
-                    IsRequired = true
+                    ParentCommentId = level3Comments[1].Id,
+                    IsRequired = true,
+                    IsApproved= true // ІСНУЮЧІ КОМЕНТАРІ ВЖЕ СХВАЛЕНІ
                 }
             };
 
@@ -1055,15 +1091,266 @@ namespace WebApp.Db
                 // Зберігаємо всі коментарі в базу
                 context.Database.OpenConnection();
                 context.Database.ExecuteSqlRaw("SET IDENTITY_INSERT Comments ON");
-
                 context.Comments.AddRange(allComments);
                 context.SaveChanges();
-
                 context.Database.ExecuteSqlRaw("SET IDENTITY_INSERT Comments OFF");
                 context.Database.CloseConnection();
-
             }
         }
+
+        //private static void SeedComments(AgencyDBContext context)
+        //{
+        //    if (!context.Comments.Any())
+        //    {
+        //        var posts = context.Posts.ToList();
+        //        var allComments = new List<Comment>();
+        //        var commentId = 1;
+
+
+        //        // Список унікальних аватарок з сервісу
+        //        var avatarUrls = new List<string>
+        //        {
+        //            "https://i.pravatar.cc/150?img=1",
+        //            "https://i.pravatar.cc/150?img=2",
+        //            "https://i.pravatar.cc/150?img=3",
+        //            "https://i.pravatar.cc/150?img=4",
+        //            "https://i.pravatar.cc/150?img=5",
+        //            "https://i.pravatar.cc/150?img=6",
+        //            "https://i.pravatar.cc/150?img=7",
+        //            "https://i.pravatar.cc/150?img=8",
+        //            "https://i.pravatar.cc/150?img=9",
+        //            "https://i.pravatar.cc/150?img=10",
+        //            "https://i.pravatar.cc/150?img=11",
+        //            "https://i.pravatar.cc/150?img=12",
+        //            "https://i.pravatar.cc/150?img=13",
+        //            "https://i.pravatar.cc/150?img=14",
+        //            "https://i.pravatar.cc/150?img=15"
+        //        };
+
+        //        var avatarIndex = 0;
+
+
+        //        foreach (var post in posts)
+        //        {
+        //            // ==== РІВЕНЬ 1: Кореневі коментарі ====
+        //            var rootComments = new List<Comment>
+        //    {
+        //        new Comment {
+        //            Id = commentId++,
+        //            UserLogin = "alex",
+        //            UserEmail = "alex@mail.com",
+        //            UserAvatar = "avatar1.png",
+        //            Text = "Дуже цікава стаття про " + post.Name + "!",
+        //            DateOfCreated = DateTime.Now.AddMinutes(-200),
+        //            PostId = post.Id, // ✅ Використовуємо ID поточного поста
+        //            ParentCommentId = null,
+        //            IsRequired = true
+        //        },
+        //        new Comment {
+        //            Id = commentId++,
+        //            UserLogin = "maria",
+        //            UserEmail = "maria@mail.com",
+        //            UserAvatar = "~/img/user.jpg",
+        //            Text = "Повністю погоджуюсь з автором статті!",
+        //            DateOfCreated = DateTime.Now.AddMinutes(-180),
+        //            PostId = post.Id, // ✅ Використовуємо ID поточного поста
+        //            ParentCommentId = null,
+        //            IsRequired = true
+        //        },
+        //        new Comment {
+        //            Id = commentId++,
+        //            UserLogin = "john",
+        //            UserEmail = "john@mail.com",
+        //            UserAvatar = "~/img/avatar3.png",
+        //            Text = "Маю кілька зауважень щодо цієї теми.",
+        //            DateOfCreated = DateTime.Now.AddMinutes(-150),
+        //            PostId = post.Id, // ✅ Використовуємо ID поточного поста
+        //            ParentCommentId = null,
+        //            IsRequired = true
+        //        },
+        //        new Comment {
+        //            Id = commentId++,
+        //            UserLogin = "olga",
+        //            UserEmail = "olga@mail.com",
+        //            UserAvatar = "~/img/avatar4.png",
+        //            Text = "Чи можете ви розповісти більше про " + post.Name + "?",
+        //            DateOfCreated = DateTime.Now.AddMinutes(-120),
+        //            PostId = post.Id, // ✅ Використовуємо ID поточного поста
+        //            ParentCommentId = null,
+        //            IsRequired = true
+        //        }
+        //    };
+
+        //            // ==== РІВЕНЬ 2: Відповіді на кореневі коментарі ====
+        //            var level2Comments = new List<Comment>
+        //    {
+        //        // Відповіді на коментар alex
+        //        new Comment {
+        //            Id = commentId++,
+        //            UserLogin = "kate",
+        //            UserEmail = "kate@mail.com",
+        //            UserAvatar = "~/img/avatar5.png",
+        //            Text = "Так, я теж знайшла багато корисного в цій статті!",
+        //            DateOfCreated = DateTime.Now.AddMinutes(-170),
+        //            PostId = post.Id,
+        //            ParentCommentId = rootComments[0].Id, // Відповідь на alex
+        //            IsRequired = true
+        //        },
+        //        new Comment {
+        //            Id = commentId++,
+        //            UserLogin = "max",
+        //            UserEmail = "max@mail.com",
+        //            UserAvatar = "/img/avatar6.png",
+        //            Text = "Особливо сподобалася практична частина.",
+        //            DateOfCreated = DateTime.Now.AddMinutes(-160),
+        //            PostId = post.Id,
+        //            ParentCommentId = rootComments[0].Id, // Відповідь на alex
+        //            IsRequired = true
+        //        },
+
+        //        // Відповіді на коментар maria
+        //        new Comment {
+        //            Id = commentId++,
+        //            UserLogin = "igor",
+        //            UserEmail = "igor@mail.com",
+        //            UserAvatar = "/img/avatar7.png",
+        //            Text = "Я також повністю згоден з Марією!",
+        //            DateOfCreated = DateTime.Now.AddMinutes(-140),
+        //            PostId = post.Id,
+        //            ParentCommentId = rootComments[1].Id, // Відповідь на maria
+        //            IsRequired = true
+        //        },
+
+        //        // Відповіді на коментар john
+        //        new Comment {
+        //            Id = commentId++,
+        //            UserLogin = "anna",
+        //            UserEmail = "anna@mail.com",
+        //            UserAvatar = "/img/avatar8.png",
+        //            Text = "Які саме зауваження у вас є? Мені цікаво почути.",
+        //            DateOfCreated = DateTime.Now.AddMinutes(-130),
+        //            PostId = post.Id,
+        //            ParentCommentId = rootComments[2].Id, // Відповідь на john
+        //            IsRequired = true
+        //        },
+        //        new Comment {
+        //            Id = commentId++,
+        //            UserLogin = "artem",
+        //            UserEmail = "artem@mail.com",
+        //            UserAvatar = "/img/avatar9.png",
+        //            Text = "Дійсно, є кілька суперечливих моментів.",
+        //            DateOfCreated = DateTime.Now.AddMinutes(-125),
+        //            PostId = post.Id,
+        //            ParentCommentId = rootComments[2].Id, // Відповідь на john
+        //            IsRequired = true
+        //        },
+
+        //        // Відповіді на коментар olga
+        //        new Comment {
+        //            Id = commentId++,
+        //            UserLogin = "sergiy",
+        //            UserEmail = "sergiy@mail.com",
+        //            UserAvatar = "/img/avatar10.png",
+        //            Text = "Я можу допомогти з додатковою інформацією!",
+        //            DateOfCreated = DateTime.Now.AddMinutes(-110),
+        //            PostId = post.Id,
+        //            ParentCommentId = rootComments[3].Id, // Відповідь на olga
+        //            IsRequired = true
+        //        }
+        //    };
+
+        //            // ==== РІВЕНЬ 3: Відповіді на відповіді ====
+        //            var level3Comments = new List<Comment>
+        //    {
+        //        // Відповідь на відповідь kate
+        //        new Comment {
+        //            Id = commentId++,
+        //            UserLogin = "natalia",
+        //            UserEmail = "natalia@mail.com",
+        //            UserAvatar = "/img/avatar11.png",
+        //            Text = "Кате, яка частина була найкориснішою для вас?",
+        //            DateOfCreated = DateTime.Now.AddMinutes(-155),
+        //            PostId = post.Id,
+        //            ParentCommentId = level2Comments[0].Id, // Відповідь на kate
+        //            IsRequired = true
+        //        },
+
+        //        // Відповідь на відповідь anna
+        //        new Comment {
+        //            Id = commentId++,
+        //            UserLogin = "john", // Той самий john відповідає
+        //            UserEmail = "john@mail.com",
+        //            UserAvatar = "/img/avatar3.png",
+        //            Text = "Анно, звичайно! Мені здається, що автор недооцінив важливість...",
+        //            DateOfCreated = DateTime.Now.AddMinutes(-120),
+        //            PostId = post.Id,
+        //            ParentCommentId = level2Comments[3].Id, // Відповідь на anna
+        //            IsRequired = true
+        //        },
+
+        //        // Відповідь на відповідь artem
+        //        new Comment {
+        //            Id = commentId++,
+        //            UserLogin = "viktor",
+        //            UserEmail = "viktor@mail.com",
+        //            UserAvatar = "/img/avatar12.png",
+        //            Text = "Артеме, які саме моменти ви вважаєте суперечливими?",
+        //            DateOfCreated = DateTime.Now.AddMinutes(-115),
+        //            PostId = post.Id,
+        //            ParentCommentId = level2Comments[4].Id, // Відповідь на artem
+        //            IsRequired = true
+        //        }
+        //    };
+
+        //            // ==== РІВЕНЬ 4: Глибша вкладеність ====
+        //            var level4Comments = new List<Comment>
+        //    {
+        //        // Відповідь на відповідь natalia
+        //        new Comment {
+        //            Id = commentId++,
+        //            UserLogin = "kate", // Той самий kate відповідає
+        //            UserEmail = "kate@mail.com",
+        //            UserAvatar = "/img/avatar5.png",
+        //            Text = "Наталіє, мені найбільше сподобався розділ про впровадження на практиці!",
+        //            DateOfCreated = DateTime.Now.AddMinutes(-145),
+        //            PostId = post.Id,
+        //            ParentCommentId = level3Comments[0].Id, // Відповідь на natalia
+        //            IsRequired = true
+        //        },
+
+        //        // Відповідь на відповідь john
+        //        new Comment {
+        //            Id = commentId++,
+        //            UserLogin = "artem",
+        //            UserEmail = "artem@mail.com",
+        //            UserAvatar = "/img/avatar9.png",
+        //            Text = "Джоне, я згоден з твоїми зауваженнями! Особливо щодо масштабованості.",
+        //            DateOfCreated = DateTime.Now.AddMinutes(-115),
+        //            PostId = post.Id,
+        //            ParentCommentId = level3Comments[1].Id, // Відповідь на john (рівень 3)
+        //            IsRequired = true
+        //        }
+        //    };
+
+        //            // Додаємо всі коментарі поста до загального списку
+        //            allComments.AddRange(rootComments);
+        //            allComments.AddRange(level2Comments);
+        //            allComments.AddRange(level3Comments);
+        //            allComments.AddRange(level4Comments);
+        //        }
+
+        //        // Зберігаємо всі коментарі в базу
+        //        context.Database.OpenConnection();
+        //        context.Database.ExecuteSqlRaw("SET IDENTITY_INSERT Comments ON");
+
+        //        context.Comments.AddRange(allComments);
+        //        context.SaveChanges();
+
+        //        context.Database.ExecuteSqlRaw("SET IDENTITY_INSERT Comments OFF");
+        //        context.Database.CloseConnection();
+
+        //    }
+        //}
 
 
         /// <summary>

@@ -19,6 +19,8 @@ namespace WebApp.Entities
         public virtual Post Post { get; set; }
 
         public virtual Comment ParentComment { get; set; }
+
+        public bool IsApproved { get; set; } = false; //  поле для модерації
         public virtual ICollection<Comment> Childs { get; set; } = new List<Comment>();
     }
 }

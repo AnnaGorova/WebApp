@@ -24,6 +24,20 @@ namespace WebApp.Models
             return BuildCommentsTree(allComments, null);
         }
 
+
+
+        public IEnumerable<Comment> GetApprovedCommentsTree(int postId)
+        {
+            var allComments = _agencyDBContext.Comments
+                .Include(c => c.Childs)
+                .Where(c => c.PostId == postId && c.IsApproved == true) // ✅ Тільки схвалені
+                .ToList();
+
+            return BuildCommentsTree(allComments, null);
+        }
+
+
+
         // Рекурсивний метод для побудови дерева коментарів (аналогічно навігації)
         private List<Comment> BuildCommentsTree(List<Comment> allComments, int? parentCommentId)
         {

@@ -91,7 +91,13 @@
                             <p>Loading comments...</p>
                         </div>
                     </div>
-                    <script>
+
+                    
+
+
+
+
+                    @* <script>
                         // Глобальні змінні для відстеження стану
                         let currentReplyTo = null;
 
@@ -340,7 +346,7 @@
                                 }
                             }, 5000);
                         }
-                    </script>
+                    </script>*@
                     <!-- Comment List End -->
                     <!-- Comment Form Start -->
                     <div class="bg-light rounded p-5">
@@ -396,6 +402,9 @@
                         <h3>Post not found</h3>
                         <p>The requested blog post could not be found.</p>
                     </div>
+
+
+                    
                 }
             </div>
 
@@ -492,6 +501,11 @@
     </div>
 </div>
 <!-- Blog End -->
+@section Scripts {
+    <script src="~/js/comments.js"></script>
+}
+
+
 <!-- Vendor Start -->
 <div class="container-fluid py-5 wow fadeInUp" data-wow-delay="0.1s">
     <div class="container py-5 mb-5">

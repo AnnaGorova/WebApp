@@ -2,6 +2,7 @@
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using WebApp.Db;
 using WebApp.Dto;
 using WebApp.Entities;
@@ -58,9 +59,10 @@ namespace WebApp.Controllers
 
             Console.WriteLine($"🔍 Getting comments for post: {post.Name} (ID: {post.Id})");
 
-            // ✅ ВИКОРИСТОВУЄМО ДЕРЕВОПОДІБНИЙ МЕТОД ЗАМІСТЬ ПЛОСКОГО СПИСКУ
-            var commentsTree = _commentsModel.GetCommentsTree(post.Id);
-            
+            //// ✅ ВИКОРИСТОВУЄМО ДЕРЕВОПОДІБНИЙ МЕТОД ЗАМІСТЬ ПЛОСКОГО СПИСКУ
+            //var commentsTree = _commentsModel.GetCommentsTree(post.Id);
+            // ✅ ФІЛЬТРУЄМО ТІЛЬКИ СХВАЛЕНІ КОМЕНТАРІ
+            var commentsTree = _commentsModel.GetApprovedCommentsTree(post.Id);
 
             // Конвертуємо дерево в плоский список з рівнями для відображення
             List<CommentDto> commentDtos = ConvertTreeToFlatList(commentsTree);
@@ -80,7 +82,7 @@ namespace WebApp.Controllers
             return JsonSerializer.Serialize(response, jso);
         }
 
-
+   
 
 
 
@@ -95,12 +97,14 @@ namespace WebApp.Controllers
                     Id = comment.Id,
                     UserLogin = comment.UserLogin,
                     UserEmail = comment.UserEmail,
-                    UserAvatar = comment.UserAvatar,
+                    
+                    UserAvatar = !string.IsNullOrEmpty(comment.UserAvatar) ? comment.UserAvatar : "/img/user.jpg",
                     Text = comment.Text,
                     DateOfCreated = comment.DateOfCreated,
                     PostId = comment.PostId,
                     ParentCommentId = comment.ParentCommentId,
-                    Level = level // Додаємо інформацію про рівень вкладеності
+                    Level = level, // Додаємо інформацію про рівень вкладеності
+                    IsApproved = comment.IsApproved //  Додаємо інформацію про модерацію
                 });
 
                 // Рекурсивно додаємо дочірні коментарі
@@ -232,17 +236,24 @@ namespace WebApp.Controllers
                     });
                 }
 
+
+                // ✅ ГЕНЕРУЄМО ВИПАДКОВУ АВАТАРКУ для нового коментаря
+                var random = new Random();
+                var avatarNumber = random.Next(1, 16); // Випадкове число від 1 до 15
+                var randomAvatar = $"https://i.pravatar.cc/150?img={avatarNumber}";
+
                 // Створюємо новий коментар
                 var newComment = new Comment
                 {
                     UserLogin = request.UserName,
                     UserEmail = request.UserEmail ?? "",
-                    UserAvatar = "user.jpg", // дефолтне зображення
+                    UserAvatar = randomAvatar, // ✅ ВИПАДКОВА АВАТАРКА
                     Text = request.CommentText,
                     DateOfCreated = DateTime.Now,
                     PostId = post.Id,
                     ParentCommentId = request.ParentCommentId,
-                    IsRequired = true
+                    IsRequired = true,
+                     IsApproved = false // НОВИЙ КОМЕНТАР ПОТРЕБУЄ МОДЕРАЦІЇ
                 };
 
                 // Зберігаємо в базу
