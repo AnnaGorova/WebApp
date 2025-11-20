@@ -1,0 +1,43 @@
+﻿<!DOCTYPE html>
+<html class="h-full" data-theme-mode="dark" dir="ltr" lang="en">
+<head>
+    <title> Панель Администратора - Dashboard </title>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1, shrink-to-fit=no" name="viewport" />
+    <link href="~/assets/media/app/apple-touch-icon.png" rel="apple-touch-icon" sizes="180x180" />
+    <link href="~/assets/media/app/favicon-32x32.png" rel="icon" sizes="32x32" type="image/png" />
+    <link href="~/assets/media/app/favicon-16x16.png" rel="icon" sizes="16x16" type="image/png" />
+    <link href="~/assets/media/app/favicon.ico" rel="shortcut icon" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link href="~/assets/vendors/apexcharts/apexcharts.css" rel="stylesheet" />
+    <link href="~/assets/vendors/keenicons/styles.bundle.css" rel="stylesheet" />
+    <link href="~/assets/css/styles.css" rel="stylesheet" />
+</head>
+<body class="dark antialiased flex h-full text-base text-gray-700 [--tw-page-bg:#fefefe] [--tw-page-bg-dark:var(--tw-coal-500)] demo1 sidebar-fixed header-fixed bg-[--tw-page-bg] dark:bg-[--tw-page-bg-dark]">
+
+    <script>
+        document.documentElement.classList.add('dark');
+        document.documentElement.setAttribute('data-theme-mode', 'dark');
+        localStorage.setItem('theme', 'dark');
+    </script>
+    
+    <div class="flex grow">
+        @await Component.InvokeAsync("AdminSidebar")
+        <div class="wrapper flex grow flex-col">
+            @await Component.InvokeAsync("AdminHeader")
+            <main class="grow content pt-5" id="content" role="content">
+                @RenderBody();
+            </main>
+            @await Component.InvokeAsync("AdminFooter")
+        </div>
+    </div>
+    <script src="~/assets/js/core.bundle.js">
+    </script>
+    <script src="~/assets/vendors/apexcharts/apexcharts.min.js">
+    </script>
+    <script src="~/assets/js/widgets/general.js">
+    </script>
+    <script src="~/assets/js/layouts/demo1.js">
+    </script>
+</body>
+</html>
