@@ -1,3 +1,5 @@
+using Microsoft.AspNetCore.Authentication.Cookies;
+
 using Microsoft.EntityFrameworkCore;
 using WebApp.Db;
 using WebApp.Models;
@@ -12,8 +14,17 @@ namespace WebApp
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();
-
             builder.Services.AddDbContext<AgencyDBContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("AgencyDBConnection")));
+
+            builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(
+                    option =>
+                    {
+                        option.LoginPath = new PathString("/Account/LoginIn");
+                        option.AccessDeniedPath = new PathString("/Error/AccessDenied");  
+                    }
+            );
+                
+
 
             builder.Services.AddScoped<OptionModels>();
             builder.Services.AddScoped<TagModel>();
@@ -44,7 +55,12 @@ namespace WebApp
 
             app.UseRouting();
 
+            
+
+
+            app.UseAuthentication();
             app.UseAuthorization();
+
 
             app.MapControllerRoute(
                 name: "default",

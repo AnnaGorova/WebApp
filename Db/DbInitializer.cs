@@ -50,6 +50,7 @@ namespace WebApp.Db
             SeedComments(context);
             SeedPostTags(context);
             SeedPostCategories(context);
+            SeedUsers(context);
 
 
             context.SaveChanges();
@@ -1432,5 +1433,36 @@ namespace WebApp.Db
 
 
 
+
+        private static void SeedUsers(AgencyDBContext context)
+        {
+            if (!context.Users.Any())
+            {
+                context.Users.AddRange(
+                    new User()
+                    {
+                        Email = "admin@admin.com",
+                        PasswordHash = "$MYHASH$V1$10000$811w9wRmFNb8lH/rIRFOV4iIfI+8VK33CDGwyXgCZp2mlItj",
+                        Login = "Admin Erastovich"
+                    }
+                );
+
+                context.SaveChanges();
+
+            }
+        }
+
+
     }
+
+
+
+
+
+
+      
+
+
+
+
 }

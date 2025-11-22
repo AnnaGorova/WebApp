@@ -1,7 +1,19 @@
-﻿@{
+﻿@model ErrorViewModel
+@{
     Layout = "_AccountLayout";
 }
-<form action="#" class="card-body flex flex-col gap-5 p-10" id="sign_in_form" method="get">
+
+@* <!-- ТИМЧАСОВО ДЛЯ ПЕРЕВІРКИ -->
+ <div style="background: yellow; border: 2px solid red; padding: 10px; margin: 10px;">
+     <h4>Debug Info:</h4>
+     <p>Model is null: @(Model == null)</p>
+     <p>ErrorMessage: '@Model?.ErrorMessage'</p>
+     <p>ErrorMessage is null: @(Model?.ErrorMessage == null)</p>
+     <p>ErrorMessage is empty: @(string.IsNullOrEmpty(Model?.ErrorMessage))</p>
+ </div>*@
+
+
+<form class="card-body flex flex-col gap-5 p-10" id="sign_in_form" method="post" asp-controller="Account" asp-action="CheckUser">
     <div class="text-center mb-2.5">
         <h3 class="text-lg font-medium text-gray-900 leading-none mb-2.5">
             Sign in
@@ -16,7 +28,9 @@
         </div>
     </div>
     <div class="grid grid-cols-2 gap-2.5">
-        <a class="btn btn-light btn-sm justify-center" href="#">
+        <!-- Проста кнопка, яка веде на Google OAuth -->
+        <a class="btn btn-light btn-sm justify-center"
+           href="https://accounts.google.com/o/oauth2/v2/auth?client_id=ВАШ_CLIENT_ID&redirect_uri=https://localhost:7235/Account/GoogleCallback&response_type=code&scope=email%20profile&access_type=offline">
             <img alt="" class="size-3.5 shrink-0" src="~/assets/media/brand-logos/google.svg" />
             Use Google
         </a>
@@ -26,6 +40,19 @@
             Use Apple
         </a>
     </div>
+    
+
+   @* <div class="grid grid-cols-2 gap-2.5">
+        <a class="btn btn-light btn-sm justify-center" href="#">
+            <img alt="" class="size-3.5 shrink-0" src="~/assets/media/brand-logos/google.svg" />
+            Use Google
+        </a>
+        <a class="btn btn-light btn-sm justify-center" href="#">
+            <img alt="" class="size-3.5 shrink-0 dark:hidden" src="~/assets/media/brand-logos/apple-black.svg" />
+            <img alt="" class="size-3.5 shrink-0 light:hidden" src="~/assets/media/brand-logos/apple-white.svg" />
+            Use Apple
+        </a>
+    </div>*@
     <div class="flex items-center gap-2">
         <span class="border-t border-gray-200 w-full">
         </span>
@@ -39,7 +66,7 @@
         <label class="form-label font-normal text-gray-900">
             Email
         </label>
-        <input class="input" placeholder="email@email.com" type="text" value="" />
+        <input class="input" placeholder="email@email.com" type="text" value="" name="email" />
     </div>
     <div class="flex flex-col gap-1">
         <div class="flex items-center justify-between gap-1">
@@ -51,7 +78,7 @@
             </a>
         </div>
         <div class="input" data-toggle-password="true">
-            <input name="user_password" placeholder="Enter Password" type="password" value="" />
+            <input name="password" placeholder="Enter Password" type="password" value="" />
             <button class="btn btn-icon" data-toggle-password-trigger="true" type="button">
                 <i class="ki-filled ki-eye text-gray-500 toggle-password-active:hidden">
                 </i>
@@ -66,6 +93,14 @@
             Remember me
         </span>
     </label>
+
+
+    @if (Model != null && !string.IsNullOrEmpty(Model.ErrorMessage))
+    {
+        <div style="background: #dc2626; color: white; padding: 12px; border-radius: 6px; margin: 10px 0; border: 1px solid #b91c1c;">
+            <p style="margin: 0; font-weight: 500;">@Model.ErrorMessage</p>
+        </div>
+    }
     <button class="btn btn-primary flex justify-center grow">
         Sign In
     </button>
