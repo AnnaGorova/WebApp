@@ -31,6 +31,9 @@ namespace WebApp.Db
                 }
             }
 
+
+            
+
             // Заповнюємо даними тільки якщо таблиці порожні
             SeedOptions(context);
             SeedNavigates(context);
@@ -52,6 +55,7 @@ namespace WebApp.Db
             SeedPostCategories(context);
             SeedUsers(context);
 
+            SeedPasswordResetTokens(context);
 
             context.SaveChanges();
         }
@@ -75,6 +79,7 @@ namespace WebApp.Db
                 var postsExist = context.Posts.Any();
                 var commentsExist = context.Comments.Any();
 
+                var PasswordResetTokensExist = context.PasswordResetTokens.Any();
 
                 return true; // Якщо дійшли сюди - таблиці існують
             }
@@ -1451,6 +1456,76 @@ namespace WebApp.Db
 
             }
         }
+
+
+
+
+
+
+
+
+        private static void SeedPasswordResetTokens(AgencyDBContext context)
+        {
+           
+           
+
+            // Для тестування можна додати кілька тестових токенів
+            if (!context.PasswordResetTokens.Any())
+            {
+                // Отримуємо існуючих користувачів для тестування
+                var existingUsers = context.Users.Take(2).ToList();
+
+                if (existingUsers.Any())
+                {
+                    var testTokens = new List<PasswordResetToken>
+            {
+                new PasswordResetToken
+                {
+                    Email = existingUsers[0].Email,
+                    Token = Guid.NewGuid().ToString(),
+                    ExpiryDate = DateTime.Now.AddHours(24),
+                    IsUsed = false,
+                    CreatedAt = DateTime.Now.AddHours(-1)
+                },
+                new PasswordResetToken
+                {
+                    Email = existingUsers.Count > 1 ? existingUsers[1].Email : "test@example.com",
+                    Token = Guid.NewGuid().ToString(),
+                    ExpiryDate = DateTime.Now.AddHours(-1), // Прострочений токен
+                    IsUsed = false,
+                    CreatedAt = DateTime.Now.AddDays(-1)
+                },
+                new PasswordResetToken
+                {
+                    Email = "test@example.com",
+                    Token = Guid.NewGuid().ToString(),
+                    ExpiryDate = DateTime.Now.AddHours(24),
+                    IsUsed = true, // Вже використаний токен
+                    CreatedAt = DateTime.Now.AddHours(-2)
+                }
+            };
+
+                    context.PasswordResetTokens.AddRange(testTokens);
+                    Console.WriteLine("✅ PasswordResetTokens table seeded with test data");
+                }
+                else
+                {
+                    Console.WriteLine("ℹ️ No users found for PasswordResetTokens seeding");
+                }
+            }
+            else
+            {
+                Console.WriteLine("ℹ️ PasswordResetTokens table already has data");
+            }
+        }
+
+
+
+
+
+
+
+
 
 
     }

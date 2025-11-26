@@ -68,5 +68,7 @@ namespace WebApp.Entities
         [DefaultValue(false)]
         [Display(Name = "Системна опція")]
         public bool IsSystem { get; set; }
+
+   
     }
 }

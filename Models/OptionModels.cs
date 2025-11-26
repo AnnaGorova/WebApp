@@ -45,5 +45,69 @@ namespace WebApp.Models
 
             return logo;
         }
+
+        public IEnumerable<Option> GetAllOptions()
+        {
+            return _agencyDBContext.Options.ToList();
+        }
+
+        public Option GetOptionById(int optionId)
+        {
+            return _agencyDBContext.Options.FirstOrDefault(o => o.Id == optionId);
+        }
+
+        public IEnumerable<string> GetUniqueRelations()
+        {
+            return _agencyDBContext.Options
+                 .Select(o => o.Relation)
+                 .Where(r => !string.IsNullOrEmpty(r))
+                 .Distinct()
+                 .ToList();
+        }
+
+
+
+
+        public void AddNewRelation(string newRelation)
+        {
+            // Не створюємо нову опцію, бо Relation - це лише поле групування
+            // Можна просто логувати або нічого не робити
+            Console.WriteLine($"Додано нове значення Relation: {newRelation}");
+
+            // Якщо потрібно, можна зберігати список доступних Relations в окремій таблиці
+            // Але в поточній структурі це лише поле в Options
+        }
+
+
+
+        public void UpdateOption(Option updatedOption)
+        {
+            if (updatedOption == null)
+            {
+                throw new ArgumentNullException(nameof(updatedOption), "Updated option cannot be null");
+            }
+
+            var existingOption = _agencyDBContext.Options.Find(updatedOption.Id);
+
+            if (existingOption == null)
+            {
+                throw new Exception($"Опція з ID {updatedOption.Id} не знайдена в базі даних.");
+            }
+
+            if (!existingOption.IsSystem)
+            {
+                existingOption.Name = updatedOption.Name;
+                existingOption.Key = updatedOption.Key;
+                existingOption.Value = updatedOption.Value;
+                existingOption.Relation = updatedOption.Relation;
+                existingOption.Order = updatedOption.Order;
+
+                _agencyDBContext.SaveChanges();
+            }
+            else
+            {
+                throw new Exception("Системні опції не можна редагувати.");
+            }
+        }
     }
 }

@@ -1,0 +1,219 @@
+﻿@using WebApp.Entities
+@using WebApp.ViewModels
+@{
+    var editedOption = (EditedViewOptionModel)Model;
+}
+<!-- Container -->
+<div class="container-fixed" id="content_container">
+</div>
+<!-- End of Container -->
+<!-- Container -->
+<div class="container-fixed">
+    <div class="flex flex-wrap items-center lg:items-end justify-between gap-5 pb-7.5">
+        <div class="flex flex-col justify-center gap-2">
+            <h1 class="text-xl font-medium leading-none text-gray-900">
+                Налаштування сайту 
+            </h1>
+            <div class="flex items-center gap-2 text-sm font-normal text-gray-700">
+               Редагування 
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End of Container -->
+<!-- Container -->
+<div class="container-fixed">
+    <form asp-controller="Admin" asp-action="UpdateOption" class="card" method="post">
+        <div class="card-header">
+            <h3 class="card-title">
+                @editedOption.Option.Name
+            </h3>
+        </div>
+        <div class="card-body grid gap-5">
+            <div class="flex items-baseline flex-wrap lg:flex-nowrap gap-2.5">
+                <label class="form-label max-w-32">
+                    Id
+                </label>
+                <input class="input" name="Option.Id" placeholder="" type="text" value="@editedOption.Option.Id" readonly />
+            </div>
+             <div class="flex items-baseline flex-wrap lg:flex-nowrap gap-2.5">
+                <label class="form-label max-w-32">
+                    Name
+                </label>
+
+
+                @if (editedOption.Option.IsSystem)
+                {
+                    <span class="badge badge-success badge-outline rounded-[30px]">
+                        <span class="size-1.5 rounded-full bg-success me-1.5"></span>
+                        @editedOption.Option.Name
+                    </span>
+
+                    <input type="hidden" name="Option.Name" value="@editedOption.Option.Name" />
+                }
+                else
+                {
+                    <input class="input" name="Option.Name" placeholder="" type="text" value="@editedOption.Option.Name" />
+                }
+
+                
+            </div>
+            <div class="flex items-baseline flex-wrap lg:flex-nowrap gap-2.5">
+                <label class="form-label max-w-32">
+                    Key
+                </label>
+                <input class="input" name="Option.Key" placeholder="" type="text" value="@editedOption.Option.Key" />
+            </div>
+            <div class="flex items-baseline flex-wrap lg:flex-nowrap gap-2.5">
+                <label class="form-label max-w-32">
+                    Value
+                </label>
+                <input class="input" name="Option.Value" placeholder="" type="text" value="@editedOption.Option.Value" />
+            </div>
+          
+            <div class="flex items-baseline flex-wrap gap-2.5">
+                <label class="form-label max-w-32">
+                    Relation
+                </label>
+                <div class="flex flex-col items-start grow gap-5">
+                    <select class="select" name="Option.Relation" id="relationSelect">
+
+                        <option value="">
+                            
+                        </option>
+
+                        @foreach (var oneRelation in editedOption.Relations)
+                        {
+                            <option value="@oneRelation">
+                                @oneRelation
+                            </option>
+                        }
+
+                       
+                    </select>
+                    <button type="button" class="btn btn-sm btn-light btn-outline" id="addMoreBtn">
+                        <i class="ki-filled ki-plus-squared"></i>
+                        Add more
+                    </button>
+                </div>
+            </div>
+            <div class="flex items-baseline flex-wrap lg:flex-nowrap gap-2.5">
+                <label class="form-label max-w-32">
+                    Order
+                </label>
+                <input class="input" name="Option.Order" placeholder="" type="number" value="@editedOption.Option.Order" min="1" max="128" />
+            </div>
+            <div class="flex items-baseline flex-wrap lg:flex-nowrap gap-2.5">
+                <label class="form-label max-w-32">
+                    Is System
+                </label>
+
+
+                @if (editedOption.Option.IsSystem)
+                {
+                    <span class="badge badge-danger badge-outline rounded-[30px]">
+                        <span class="size-1.5 rounded-full bg-danger me-1.5"></span>
+                        System
+                    </span>
+                }
+                else
+                {
+                    <span class="badge badge-success  badge-outline rounded-[30px]">
+                        <span class="size-1.5 rounded-full bg-success me-1.5"></span>
+                        Custom
+                    </span>
+                }
+
+                <input type="hidden" name="Option.IsSystem" value="@editedOption.Option.IsSystem.ToString()" />
+            </div>
+        </div>
+        <div class="card-footer justify-center">
+            <button class="btn btn-sm btn-primary" type="submit">
+                Зберегти зміни 
+            </button>
+        </div>
+    </form>
+</div>
+
+
+
+
+<!-- Модальне вікно для додавання нового Relation (темна тема) -->
+<div id="addRelationModal" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.9); z-index: 10000;">
+    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #1f2937; padding: 30px; border-radius: 12px; width: 500px; box-shadow: 0 25px 50px rgba(0,0,0,0.5); border: 1px solid #374151; z-index: 10001;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; border-bottom: 1px solid #374151; padding-bottom: 15px;">
+            <h3 style="margin: 0; color: #f9fafb; font-size: 22px; font-weight: 600;">➕ Додати нове Relation</h3>
+            <button type="button" id="closeModalBtn" style="background: none; border: none; font-size: 26px; cursor: pointer; color: #9ca3af; padding: 5px; transition: color 0.2s;"
+                    onmouseover="this.style.color='#ef4444'" onmouseout="this.style.color='#9ca3af'">
+                ×
+            </button>
+        </div>
+
+        <form id="addRelationForm">
+            <div style="margin-bottom: 25px;">
+                <label style="display: block; margin-bottom: 10px; font-weight: 500; color: #d1d5db; font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px;">
+                    Назва нового Relation
+                </label>
+                <input type="text" id="newRelationInput"
+                       style="width: 100%; padding: 14px; background: #111827; border: 1px solid #374151; border-radius: 8px; font-size: 16px; color: #f9fafb; transition: all 0.3s;"
+                       placeholder="social-link, contact-info, site-settings..."
+                       onfocus="this.style.borderColor='#3b82f6'; this.style.boxShadow='0 0 0 3px rgba(59, 130, 246, 0.1)'"
+                       onblur="this.style.borderColor='#374151'; this.style.boxShadow='none'"
+                       required />
+                <div style="margin-top: 8px; font-size: 12px; color: #6b7280;">
+                    Латинські літери, цифри, дефіси. Наприклад: <code style="color: #10b981;">social-links</code>
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 12px; justify-content: flex-end;">
+                <button type="button" id="cancelModalBtn"
+                        style="padding: 12px 24px; background: #dc2626; color: white; border: 1px solid #ef4444; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 600; transition: all 0.2s;"
+                        onmouseover="this.style.background='#ef4444'; this.style.boxShadow='0 4px 12px rgba(239, 68, 68, 0.3)'"
+                        onmouseout="this.style.background='#dc2626'; this.style.boxShadow='none'">
+                    🗙 Скасувати
+                </button>
+                <button type="submit"
+                        style="padding: 12px 24px; background: #059669; color: white; border: 1px solid #10b981; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 600; transition: all 0.2s;"
+                        onmouseover="this.style.background='#10b981'; this.style.boxShadow='0 4px 12px rgba(16, 185, 129, 0.3)'"
+                        onmouseout="this.style.background='#059669'; this.style.boxShadow='none'">
+                    ✅ Додати Relation
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+<script src="~/js/admin-relations.js"></script>
+
+
+
+<!-- ОКРЕМИЙ СКРИПТ ДЛЯ ОСНОВНОЇ ФОРМИ -->
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const mainForm = document.querySelector('form.card');
+
+        if (mainForm) {
+            console.log('✅ Основна форма знайдена');
+
+            mainForm.addEventListener('submit', function (e) {
+                console.log('🎯 ОСНОВНА ФОРМА ВІДПРАВЛЯЄТЬСЯ!');
+
+                // Перевіряємо дані
+                const formData = new FormData(mainForm);
+                console.log('📋 Дані форми:');
+                for (let [key, value] of formData.entries()) {
+                    console.log(`   ${key}: ${value}`);
+                }
+
+                // Дозволяємо відправку
+            });
+
+            // Додамо тестову кнопку
+            const submitBtn = mainForm.querySelector('button[type="submit"]');
+            if (submitBtn) {
+                submitBtn.addEventListener('click', function () {
+                    console.log('🖱️ Кнопка "Зберегти зміни" натиснута!');
+                });
+            }
+        }
+    });
+</script>

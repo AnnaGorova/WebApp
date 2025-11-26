@@ -25,7 +25,7 @@ namespace WebApp.Db
         public DbSet<PostTags> PostTags { get; set; }
         public DbSet<PostCategories> PostCategories { get; set; }
         public DbSet<User> Users { get; set; }
-
+        public DbSet<PasswordResetToken> PasswordResetTokens { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -56,6 +56,20 @@ namespace WebApp.Db
                 .HasOne(pc => pc.Category)
                 .WithMany(c => c.PostCategories)
                 .HasForeignKey(pc => pc.CategoryId);
+
+
+            modelBuilder.Entity<PasswordResetToken>(entity =>
+            {
+                entity.HasIndex(e => e.Token).IsUnique();
+                entity.HasIndex(e => e.Email);
+                entity.Property(e => e.CreatedAt).HasDefaultValueSql("GETDATE()");
+            });
+
+
+
         }
+
+
+
     }
 }

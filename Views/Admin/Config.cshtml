@@ -1,0 +1,250 @@
+﻿@using WebApp.Entities
+@using WebApp.ViewModels
+@{
+    var optionList = (List<Option>)Model;
+}
+<!-- Container -->
+<div class="container-fixed" id="content_container">
+</div>
+<!-- End of Container -->
+<!-- Container -->
+<div class="container-fixed">
+    <div class="flex flex-wrap items-center lg:items-end justify-between gap-5 pb-7.5">
+        <div class="flex flex-col justify-center gap-2">
+            <h1 class="text-xl font-medium leading-none text-gray-900">
+                Налаштування сайту 
+            </h1>
+            <div class="flex items-center gap-2 text-sm font-normal text-gray-700">
+                Управляй системою самостійно
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End of Container -->
+<!-- Container -->
+<div class="container-fixed">
+    <div class="grid gap-5 lg:gap-7.5">
+        <div class="card card-grid min-w-full">
+            <div class="card-header flex-wrap gap-2">
+                <h3 class="card-title font-medium text-sm">
+                    Showing 20 of 68 users
+                </h3>
+                <div class="flex flex-wrap gap-2 lg:gap-5">
+                    <div class="flex">
+                        <label class="input input-sm">
+                            <i class="ki-filled ki-magnifier">
+                            </i>
+                            <input data-datatable-search="#team_crew_table" placeholder="Search users" type="text" value="">
+                        </label>
+                    </div>
+                    <div class="flex flex-wrap gap-2.5">
+                        <select class="select select-sm w-28">
+                            <option value="1">
+                                Active
+                            </option>
+                            <option value="2">
+                                Disabled
+                            </option>
+                            <option value="2">
+                                Pending
+                            </option>
+                        </select>
+                        <select class="select select-sm w-28">
+                            <option value="1">
+                                Latest
+                            </option>
+                            <option value="2">
+                                Older
+                            </option>
+                            <option value="3">
+                                Oldest
+                            </option>
+                        </select>
+                        <button class="btn btn-sm btn-outline btn-primary">
+                            <i class="ki-filled ki-setting-4"></i>
+                            Filters
+                        </button>
+                        <button class="btn btn-sm btn-success">
+                            <i class="ki-filled ki-plus-squared">
+                            </i>
+                            New Campaign
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <div data-datatable="true" data-datatable-state-save="false" id="team_crew_table">
+                    <div class="scrollable-x-auto">
+                        <table class="table table-auto table-border" data-datatable-table="true">
+                            <thead>
+
+                                <tr>
+                                    <th class="w-[60px] text-center">
+                                        Id
+                                    </th>
+                                    <th class="min-w-[180px]">
+                                        <span class="sort asc">
+                                            <span class="sort-label font-normal text-gray-700">
+                                                Name
+                                            </span>
+                                            <span class="sort-icon">
+                                            </span>
+                                        </span>
+                                    </th>
+                                    <th class="min-w-[300px]">
+                                        <span class="sort">
+                                            <span class="sort-label font-normal text-gray-700">
+                                                Key
+                                            </span>
+                                            <span class="sort-icon">
+                                            </span>
+                                        </span>
+                                    </th>
+                                    <th class="min-w-[300px]">
+                                        <span class="sort">
+                                            <span class="sort-label font-normal text-gray-700">
+                                                Value
+                                            </span>
+                                            <span class="sort-icon">
+                                            </span>
+                                        </span>
+                                    </th>
+                                    <th class="min-w-[90px]">
+                                        <span class="sort">
+                                            <span class="sort-label font-normal text-gray-700">
+                                                Relation
+                                            </span>
+                                            <span class="sort-icon">
+                                            </span>
+                                        </span>
+                                    </th>
+                                    <th class="min-w-[60px]">
+                                        <span class="sort">
+                                            <span class="sort-label font-normal text-gray-700">
+                                                Order
+                                            </span>
+                                            <span class="sort-icon">
+                                            </span>
+                                        </span>
+                                    </th>
+                                    <th class="min-w-[120px]">
+                                        <span class="sort">
+                                            <span class="sort-label font-normal text-gray-700">
+                                                Is System
+                                            </span>
+                                            <span class="sort-icon">
+                                            </span>
+                                        </span>
+                                    </th>
+                                    <th class="min-w-[180px]">
+                                        <span class="sort">
+                                            <span class="sort-label font-normal text-gray-700">
+                                                Activity
+                                            </span>
+                                            <span class="sort-icon">
+                                            </span>
+                                        </span>
+                                    </th>
+                                </tr>
+
+                            </thead>
+                            <tbody>
+                                @foreach (Option oneOption in optionList)
+                                {
+                                <tr>
+                                    <td class="text-center">
+                                        <span readonly>@oneOption.Id</span>
+                                    </td>
+                                    <td>
+                                        @oneOption.Name
+                                    </td>
+                                    <td class="text-gray-800 font-normal">
+                                        @oneOption.Key
+                                    </td>
+                                    <td class="text-gray-800 font-normal">
+                                        @oneOption.Value
+                                    </td>
+                                    <td class="text-gray-800 font-normal">
+                                        @oneOption.Relation
+                                    </td>
+                                    <td class="text-gray-800 font-normal">
+                                        @oneOption.Order
+                                    </td>
+                                    <td>
+                                        @if (oneOption.IsSystem)
+                                            {
+                                        <span class="badge badge-danger badge-outline rounded-[30px]">
+                                            <span class="size-1.5 rounded-full bg-danger me-1.5"></span>
+                                            System
+                                        </span>
+                                            }
+                                            else
+                                            {
+                                        <span class="badge badge-success  badge-outline rounded-[30px]">
+                                            <span class="size-1.5 rounded-full bg-success me-1.5"></span>
+                                            Custom
+                                        </span>
+                                            }
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="menu flex-inline" data-menu="true">
+                                            <div class="menu-item" data-menu-item-offset="0, 10px" data-menu-item-placement="bottom-end" data-menu-item-placement-rtl="bottom-start" data-menu-item-toggle="dropdown" data-menu-item-trigger="click|lg:click">
+                                                <button class="menu-toggle btn btn-sm btn-icon btn-light btn-clear">
+                                                    <i class="ki-filled ki-dots-vertical">
+                                                    </i>
+                                                </button>
+                                                <div class="menu-dropdown menu-default w-full max-w-[175px]" data-menu-dismiss="true">
+                                                    <div class="menu-item">
+                                                        <a class="menu-link" href="/Admin/editOption?optionId=@oneOption.Id">
+                                                            <span class="menu-icon">
+                                                                <i class="ki-filled ki-pencil">
+                                                                </i>
+                                                            </span>
+                                                            <span class="menu-title">
+                                                                Edit
+                                                            </span>
+                                                        </a>
+                                                    </div>
+                                                        @if (!oneOption.IsSystem)
+                                                        {
+                                                            <div class="menu-item">
+                                                                <form asp-controller="Admin" asp-action="DeleteOption" method="post" style="display: inline;">
+                                                                    <input type="hidden" name="id" value="@oneOption.Id" />
+                                                                    <button type="submit" class="menu-link" style="background: none; border: none; width: 100%; text-align: left;"
+                                                                            onclick="return confirm('Видалити опцію \'@oneOption.Name\'?')">
+                                                                        <span class="menu-icon">
+                                                                            <i class="ki-filled ki-trash"></i>
+                                                                        </span>
+                                                                        <span class="menu-title">Remove</span>
+                                                                    </button>
+                                                                </form>
+                                                            </div>
+                                                        }
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="card-footer justify-center md:justify-between flex-col md:flex-row gap-5 text-gray-600 text-2sm font-medium">
+                        <div class="flex items-center gap-2 order-2 md:order-1">
+                            Show
+                            <select class="select select-sm w-16" data-datatable-size="true" name="perpage">
+                            </select>
+                            per page
+                        </div>
+                        <div class="flex items-center gap-4 order-1 md:order-2">
+                            <span data-datatable-info="true">
+                            </span>
+                            <div class="pagination" data-datatable-pagination="true">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
