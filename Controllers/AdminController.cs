@@ -142,37 +142,154 @@ namespace WebApp.Controllers
 
 
 
+        //[HttpPost]
+        //public IActionResult DeleteOption(int id)
+        //{
+        //    try
+        //    {
+        //        var option = _optionModels.GetOptionById(id);
+
+        //        if (option == null)
+        //        {
+        //            TempData["ErrorMessage"] = "Опція не знайдена";
+        //            return RedirectToAction("Config");
+        //        }
+
+        //        if (option.IsSystem)
+        //        {
+        //            TempData["ErrorMessage"] = "Системні опції не можна видаляти";
+        //            return RedirectToAction("Config");
+        //        }
+
+        //        _agencyDBContext.Options.Remove(option);
+        //        _agencyDBContext.SaveChanges();
+
+        //        TempData["SuccessMessage"] = "Опцію успішно видалено";
+        //        return RedirectToAction("Config");
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        TempData["ErrorMessage"] = "Помилка при видаленні опції: " + ex.Message;
+        //        return RedirectToAction("Config");
+        //    }
+        //}
+
+
+      
         [HttpPost]
         public IActionResult DeleteOption(int id)
         {
             try
             {
+                Console.WriteLine($"=== DELETE OPTION ATTEMPT ===");
+                Console.WriteLine($"Option ID: {id}");
+
                 var option = _optionModels.GetOptionById(id);
 
                 if (option == null)
                 {
+                    Console.WriteLine($"❌ Option not found: {id}");
                     TempData["ErrorMessage"] = "Опція не знайдена";
                     return RedirectToAction("Config");
                 }
 
                 if (option.IsSystem)
                 {
+                    Console.WriteLine($"❌ System option cannot be deleted: {id}");
                     TempData["ErrorMessage"] = "Системні опції не можна видаляти";
                     return RedirectToAction("Config");
                 }
 
+                Console.WriteLine($"✅ Deleting option: {option.Name} (ID: {option.Id})");
+
                 _agencyDBContext.Options.Remove(option);
                 _agencyDBContext.SaveChanges();
 
+                Console.WriteLine($"✅ Option deleted successfully");
                 TempData["SuccessMessage"] = "Опцію успішно видалено";
                 return RedirectToAction("Config");
             }
             catch (Exception ex)
             {
+                Console.WriteLine($"❌ Error deleting option: {ex.Message}");
                 TempData["ErrorMessage"] = "Помилка при видаленні опції: " + ex.Message;
                 return RedirectToAction("Config");
             }
         }
 
+
+
+
+
+
+
+
+
+        [HttpPost]
+        public IActionResult AddOption(Option newOption)
+        {
+            try
+            {
+                Console.WriteLine("=== ADD NEW OPTION ===");
+                Console.WriteLine($"Name: {newOption?.Name}");
+                Console.WriteLine($"Key: {newOption?.Key}");
+                Console.WriteLine($"Value: {newOption?.Value}");
+                Console.WriteLine($"Relation: {newOption?.Relation}");
+                Console.WriteLine($"Order: {newOption?.Order}");
+                Console.WriteLine($"IsSystem: {newOption?.IsSystem}");
+
+                if (newOption == null || string.IsNullOrEmpty(newOption.Name))
+                {
+                    TempData["ErrorMessage"] = "Назва опції обов'язкова";
+                    return RedirectToAction("Config");
+                }
+
+                // Якщо IsSystem не відмічено - встановлюємо false
+                if (!newOption.IsSystem)
+                {
+                    newOption.IsSystem = false;
+                }
+
+                _agencyDBContext.Options.Add(newOption);
+                _agencyDBContext.SaveChanges();
+
+                TempData["SuccessMessage"] = "Нову опцію успішно додано!";
+                return RedirectToAction("Config");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"❌ ERROR: {ex.Message}");
+                TempData["ErrorMessage"] = "Помилка при додаванні опції: " + ex.Message;
+                return RedirectToAction("Config");
+            }
+        }
+
+
+
+
+
+        [HttpGet]
+        public IActionResult GetRelations()
+        {
+            try
+            {
+                // Отримуємо унікальні значення Relation з бази даних
+                var relations = _agencyDBContext.Options
+                    .Select(o => o.Relation)
+                    .Where(r => !string.IsNullOrEmpty(r))
+                    .Distinct()
+                    .OrderBy(r => r)
+                    .ToList();
+
+                Console.WriteLine($"✅ Found {relations.Count} unique relations");
+
+                return Json(relations);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"❌ Error getting relations: {ex.Message}");
+                return Json(new List<string>());
+            }
+        }
     }
 }

@@ -64,10 +64,10 @@
                             <i class="ki-filled ki-setting-4"></i>
                             Filters
                         </button>
-                        <button class="btn btn-sm btn-success">
+                        <button class="btn btn-sm btn-success" onclick="openAddOptionModal()">
                             <i class="ki-filled ki-plus-squared">
                             </i>
-                            New Campaign
+                            New Option
                         </button>
                     </div>
                 </div>
@@ -208,16 +208,14 @@
                                                         @if (!oneOption.IsSystem)
                                                         {
                                                             <div class="menu-item">
-                                                                <form asp-controller="Admin" asp-action="DeleteOption" method="post" style="display: inline;">
-                                                                    <input type="hidden" name="id" value="@oneOption.Id" />
-                                                                    <button type="submit" class="menu-link" style="background: none; border: none; width: 100%; text-align: left;"
-                                                                            onclick="return confirm('Видалити опцію \'@oneOption.Name\'?')">
-                                                                        <span class="menu-icon">
-                                                                            <i class="ki-filled ki-trash"></i>
-                                                                        </span>
-                                                                        <span class="menu-title">Remove</span>
-                                                                    </button>
-                                                                </form>
+                                                                <button class="menu-link"
+                                                                        onclick="openDeleteModal(@oneOption.Id, '@oneOption.Name')"
+                                                                        style="background: none; border: none; width: 100%; text-align: left; cursor: pointer;">
+                                                                    <span class="menu-icon">
+                                                                        <i class="ki-filled ki-trash"></i>
+                                                                    </span>
+                                                                    <span class="menu-title">Remove</span>
+                                                                </button>
                                                             </div>
                                                         }
                                                 </div>
@@ -248,3 +246,309 @@
         </div>
     </div>
 </div>
+
+
+
+
+<script>
+    // Ініціалізація для Config сторінки
+    document.addEventListener('DOMContentLoaded', function () {
+        console.log('🔄 Config page loaded');
+
+        // Завантажити Relations
+        if (typeof loadRelationsToSelect === 'function') {
+            loadRelationsToSelect();
+        }
+
+        // Ініціалізація модальних вікон
+        const addRelationModal = document.getElementById('addRelationModal');
+        if (addRelationModal) {
+            addRelationModal.addEventListener('click', function (e) {
+                if (e.target === this) closeAddRelationModal();
+            });
+        }
+
+        const addOptionModal = document.getElementById('addOptionModal');
+        if (addOptionModal) {
+            addOptionModal.addEventListener('click', function (e) {
+                if (e.target === this) closeAddOptionModal();
+            });
+        }
+
+        const deleteModal = document.getElementById('deleteModal');
+        if (deleteModal) {
+            deleteModal.addEventListener('click', function (e) {
+                if (e.target === this) closeDeleteModal();
+            });
+        }
+
+        // ESC для всіх модальних вікон
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape') {
+                if (addRelationModal && addRelationModal.style.display === 'block') closeAddRelationModal();
+                if (addOptionModal && addOptionModal.style.display === 'block') closeAddOptionModal();
+                if (deleteModal && deleteModal.style.display === 'block') closeDeleteModal();
+            }
+        });
+    });
+</script>
+
+
+<!-- Модальне вікно для видалення -->
+<div id="deleteModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 10000;">
+    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #1f2937; padding: 30px; border-radius: 12px; width: 450px; box-shadow: 0 25px 50px rgba(0,0,0,0.5); border: 1px solid #374151;">
+        <!-- Заголовок -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid #374151; padding-bottom: 15px;">
+            <h3 style="margin: 0; color: #f9fafb; font-size: 20px; font-weight: 600;">🗑️ Видалити опцію</h3>
+            <button onclick="closeDeleteModal()" style="background: none; border: none; font-size: 24px; cursor: pointer; color: #9ca3af; padding: 5px;">
+                ×
+            </button>
+        </div>
+
+        <!-- Контент -->
+        <div style="margin-bottom: 25px;">
+            <p style="color: #d1d5db; margin: 0 0 15px 0; line-height: 1.5;">
+                Ви впевнені, що хочете видалити опцію:
+            </p>
+            <div style="background: #111827; padding: 15px; border-radius: 8px; border: 1px solid #374151;">
+                <p style="color: #f9fafb; font-weight: 600; margin: 0; font-size: 16px;" id="deleteOptionName"></p>
+            </div>
+            <p style="color: #ef4444; font-size: 14px; margin: 10px 0 0 0;">
+                ⚠️ Цю дію неможливо скасувати!
+            </p>
+        </div>
+
+        <!-- Кнопки -->
+        <div style="display: flex; gap: 12px; justify-content: flex-end;">
+            <button onclick="closeDeleteModal()"
+                    style="padding: 10px 20px; background: #374151; color: #d1d5db; border: 1px solid #4b5563; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 600; transition: all 0.2s;"
+                    onmouseover="this.style.background='#4b5563'"
+                    onmouseout="this.style.background='#374151'">
+                Скасувати
+            </button>
+            <form id="deleteForm" method="post" action="/Admin/DeleteOption" style="display: inline;">
+                <input type="hidden" name="id" id="deleteOptionId" />
+                <button type="submit"
+                        style="padding: 10px 20px; background: #dc2626; color: white; border: 1px solid #ef4444; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 600; transition: all 0.2s;"
+                        onmouseover="this.style.background='#ef4444'"
+                        onmouseout="this.style.background='#dc2626'">
+                    Видалити назавжди
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+<!-- Модальне вікно для додавання нової опції -->
+<div id="addOptionModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 10000;">
+    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #1f2937; padding: 30px; border-radius: 12px; width: 500px;">
+        <!-- Додайте кнопку закриття -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h3 style="margin: 0; color: #f9fafb;">➕ Додати нову опцію</h3>
+            <button onclick="closeAddOptionModal()" style="background: none; border: none; font-size: 24px; cursor: pointer; color: #9ca3af; padding: 5px;">
+                ×
+            </button>
+        </div>
+
+        <form method="post" action="/Admin/AddOption">
+            <div style="margin-bottom: 15px;">
+                <label style="color: #d1d5db; display: block; margin-bottom: 5px;">Name</label>
+                <input type="text" name="name" required style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #374151; background: #111827; color: white;">
+            </div>
+
+            <div style="margin-bottom: 15px;">
+                <label style="color: #d1d5db; display: block; margin-bottom: 5px;">Key</label>
+                <input type="text" name="key" required style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #374151; background: #111827; color: white;">
+            </div>
+
+            <div style="margin-bottom: 15px;">
+                <label style="color: #d1d5db; display: block; margin-bottom: 5px;">Value</label>
+                <input type="text" name="value" required style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #374151; background: #111827; color: white;">
+            </div>
+
+            <div style="margin-bottom: 15px;">
+                <label style="color: #d1d5db; display: block; margin-bottom: 5px;">Relation</label>
+                <div style="display: flex; gap: 10px;">
+                    <select id="relationSelect" name="Relation" style="flex: 1; padding: 10px; border-radius: 6px; border: 1px solid #374151; background: #111827; color: white;">
+                        <option value="">-- Оберіть Relation --</option>
+                        <!-- Опції будуть додані через JavaScript -->
+                    </select>
+                    <button type="button" onclick="openAddRelationModal()" style="padding: 10px; background: #374151; color: white; border: none; border-radius: 6px; cursor: pointer; white-space: nowrap;">
+                        + Додати
+                    </button>
+                </div>
+            </div>
+
+            <div style="margin-bottom: 15px;">
+                <label style="color: #d1d5db; display: block; margin-bottom: 5px;">Order</label>
+                <input type="number" name="Order" value="0" style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #374151; background: #111827; color: white;">
+            </div>
+
+            <div style="margin-bottom: 20px;">
+                <label style="color: #d1d5db; display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                    <input type="checkbox" name="IsSystem" value="true" style="transform: scale(1.2);">
+                    <span>System Option (залишіть unchecked для Custom)</span>
+                </label>
+                <small style="color: #9ca3af; font-size: 12px;">Якщо відмічено - опція буде системною (не можна видалити)</small>
+            </div>
+
+            <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                <button type="button" onclick="closeAddOptionModal()" style="padding: 10px 20px; background: #374151; color: white; border: none; border-radius: 6px; cursor: pointer;">
+                    Скасувати
+                </button>
+                <button type="submit" style="padding: 10px 20px; background: #10b981; color: white; border: none; border-radius: 6px; cursor: pointer;">
+                    Додати
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+
+
+
+<!-- Модальне вікно для додавання нового Relation (темна тема) -->
+<div id="addRelationModal" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.9); z-index: 10000;">
+    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #1f2937; padding: 30px; border-radius: 12px; width: 500px; box-shadow: 0 25px 50px rgba(0,0,0,0.5); border: 1px solid #374151; z-index: 10001;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; border-bottom: 1px solid #374151; padding-bottom: 15px;">
+            <h3 style="margin: 0; color: #f9fafb; font-size: 22px; font-weight: 600;">➕ Додати нове Relation</h3>
+            <button type="button" id="closeModalBtn" style="background: none; border: none; font-size: 26px; cursor: pointer; color: #9ca3af; padding: 5px; transition: color 0.2s;"
+                    onmouseover="this.style.color='#ef4444'" onmouseout="this.style.color='#9ca3af'">
+                ×
+            </button>
+        </div>
+
+        <form id="addRelationForm">
+            <div style="margin-bottom: 25px;">
+                <label style="display: block; margin-bottom: 10px; font-weight: 500; color: #d1d5db; font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px;">
+                    Назва нового Relation
+                </label>
+                <input type="text" id="newRelationInput"
+                       style="width: 100%; padding: 14px; background: #111827; border: 1px solid #374151; border-radius: 8px; font-size: 16px; color: #f9fafb; transition: all 0.3s;"
+                       placeholder="social-link, contact-info, site-settings..."
+                       onfocus="this.style.borderColor='#3b82f6'; this.style.boxShadow='0 0 0 3px rgba(59, 130, 246, 0.1)'"
+                       onblur="this.style.borderColor='#374151'; this.style.boxShadow='none'"
+                       required />
+                <div style="margin-top: 8px; font-size: 12px; color: #6b7280;">
+                    Латинські літери, цифри, дефіси. Наприклад: <code style="color: #10b981;">social-links</code>
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 12px; justify-content: flex-end;">
+                <button type="button" id="cancelModalBtn"
+                        style="padding: 12px 24px; background: #dc2626; color: white; border: 1px solid #ef4444; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 600; transition: all 0.2s;"
+                        onmouseover="this.style.background='#ef4444'; this.style.boxShadow='0 4px 12px rgba(239, 68, 68, 0.3)'"
+                        onmouseout="this.style.background='#dc2626'; this.style.boxShadow='none'">
+                    🗙 Скасувати
+                </button>
+                <button type="submit"
+                        style="padding: 12px 24px; background: #059669; color: white; border: 1px solid #10b981; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 600; transition: all 0.2s;"
+                        onmouseover="this.style.background='#10b981'; this.style.boxShadow='0 4px 12px rgba(16, 185, 129, 0.3)'"
+                        onmouseout="this.style.background='#059669'; this.style.boxShadow='none'">
+                    ✅ Додати Relation
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+
+
+@*
+<!-- Модальне вікно для додавання нової опції -->
+<div id="addOptionModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 10000;">
+    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #1f2937; padding: 30px; border-radius: 12px; width: 500px;">
+        <h3 style="margin: 0 0 20px 0; color: #f9fafb;">➕ Додати нову опцію</h3>
+
+        <form method="post" action="/Admin/AddOption">
+            <div style="margin-bottom: 15px;">
+                <label style="color: #d1d5db; display: block; margin-bottom: 5px;">Name</label>
+                <input type="text" name="name" style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #374151; background: #111827; color: white;">
+            </div>
+
+            <div style="margin-bottom: 15px;">
+                <label style="color: #d1d5db; display: block; margin-bottom: 5px;">Key</label>
+                <input type="text" name="key" style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #374151; background: #111827; color: white;">
+            </div>
+
+            <div style="margin-bottom: 15px;">
+                <label style="color: #d1d5db; display: block; margin-bottom: 5px;">Value</label>
+                <input type="text" name="value" style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #374151; background: #111827; color: white;">
+            </div>
+
+            <div style="margin-bottom: 15px;">
+                <label style="color: #d1d5db; display: block; margin-bottom: 5px;">Relation</label>
+                <input type="text" name="Relation" style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #374151; background: #111827; color: white;">
+            </div>
+
+            <div style="margin-bottom: 15px;">
+                <label style="color: #d1d5db; display: block; margin-bottom: 5px;">Order</label>
+                <input type="text" name="Order" style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #374151; background: #111827; color: white;">
+            </div>
+
+            <div style="margin-bottom: 15px;">
+                <label style="color: #d1d5db; display: block; margin-bottom: 5px;">IsSistem</label>
+                <input type="text" name="IsSistem" style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #374151; background: #111827; color: white;">
+            </div>
+
+            <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                <button type="button" onclick="closeAddOptionModal()" style="padding: 10px 20px; background: #374151; color: white; border: none; border-radius: 6px; cursor: pointer;">
+                    Скасувати
+                </button>
+                <button type="submit" style="padding: 10px 20px; background: #10b981; color: white; border: none; border-radius: 6px; cursor: pointer;">
+                    Додати
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+*@
+
+<script src="~/js/admin-relations.js" ></script>
+
+
+
+@*
+
+
+<script>
+    function openDeleteModal(optionId, optionName) {
+        document.getElementById('deleteOptionId').value = optionId;
+        document.getElementById('deleteOptionName').textContent = optionName;
+        document.getElementById('deleteModal').style.display = 'block';
+
+        // Блокуємо скрол сторінки
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeDeleteModal() {
+        document.getElementById('deleteModal').style.display = 'none';
+
+        // Розблоковуємо скрол сторінки
+        document.body.style.overflow = '';
+    }
+
+    // Закрити при кліку на фон
+    document.getElementById('deleteModal').addEventListener('click', function (e) {
+        if (e.target === this) {
+            closeDeleteModal();
+        }
+    });
+
+    // Закрити при натисканні Escape
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') {
+            closeDeleteModal();
+        }
+    });
+</script>
+
+
+*@

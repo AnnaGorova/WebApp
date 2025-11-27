@@ -186,34 +186,3 @@
 
 
 
-<!-- ОКРЕМИЙ СКРИПТ ДЛЯ ОСНОВНОЇ ФОРМИ -->
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const mainForm = document.querySelector('form.card');
-
-        if (mainForm) {
-            console.log('✅ Основна форма знайдена');
-
-            mainForm.addEventListener('submit', function (e) {
-                console.log('🎯 ОСНОВНА ФОРМА ВІДПРАВЛЯЄТЬСЯ!');
-
-                // Перевіряємо дані
-                const formData = new FormData(mainForm);
-                console.log('📋 Дані форми:');
-                for (let [key, value] of formData.entries()) {
-                    console.log(`   ${key}: ${value}`);
-                }
-
-                // Дозволяємо відправку
-            });
-
-            // Додамо тестову кнопку
-            const submitBtn = mainForm.querySelector('button[type="submit"]');
-            if (submitBtn) {
-                submitBtn.addEventListener('click', function () {
-                    console.log('🖱️ Кнопка "Зберегти зміни" натиснута!');
-                });
-            }
-        }
-    });
-</script>
