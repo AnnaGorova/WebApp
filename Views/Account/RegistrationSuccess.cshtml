@@ -3,17 +3,61 @@
     ViewData["Title"] = "Реєстрація успішна";
 }
 
-<div class="card-body text-center p-10">
-    <div style="background: #10b981; color: white; padding: 20px; border-radius: 10px; margin: 20px 0;">
-        <h3> Реєстрація пройшла успішно!</h3>
-        <p>Ласкаво просимо до нашої спільноти!</p>
-    </div>
+<div class="container-fixed">
+    <div class="card text-center">
+        <div class="card-header">
+            <h3 class="mb-0">Реєстрація пройшла успішно!</h3>
+        </div>
 
-    <p>Тепер ви можете повноцінно користуватися нашим сервісом.</p>
+        <div class="card-body p-10">
+            <div class="mb-6">
+                <i class="ki-filled ki-check-circle text-success" style="font-size: 4rem;"></i>
+            </div>
 
-    <div class="mt-6">
-        <a asp-controller="Home" asp-action="Index" class="btn btn-primary">
-            Перейти на головну
-        </a>
+            <h4 class="text-xl font-medium text-gray-900 mb-4">
+                Вітаємо, @TempData["RegisteredUserName"]!
+            </h4>
+
+            <div class="space-y-4 mb-6">
+                <p class="text-gray-700">
+                    Ваш акаунт був успішно створений.
+                </p>
+                <p class="text-gray-600">
+                    Email: <strong>@TempData["RegisteredUserEmail"]</strong>
+                </p>
+                <p class="text-gray-700">
+                    Тепер ви можете повноцінно користуватися всіма можливостями нашого сервісу.
+                </p>
+            </div>
+
+            <div class="flex flex-col sm:flex-row gap-3 justify-center">
+                @if (User.Identity.IsAuthenticated)
+                {
+                    <a asp-controller="Home" asp-action="Index" class="btn btn-primary">
+                        <i class="ki-filled ki-home me-2"></i>
+                        Перейти на головну
+                    </a>
+
+                    @if (User.Identity.Name == "admin@admin.com")
+                    {
+                        <a asp-controller="Admin" asp-action="Index" class="btn btn-success">
+                            <i class="ki-filled ki-setting-3 me-2"></i>
+                            Панель адміністратора
+                        </a>
+                    }
+                }
+                else
+                {
+                    <a asp-controller="Account" asp-action="LoginIn" class="btn btn-primary">
+                        <i class="ki-filled ki-login me-2"></i>
+                        Увійти в акаунт
+                    </a>
+                }
+            </div>
+        </div>
+
+        <div class="card-footer text-gray-600">
+            <small>Дякуємо, що обираєте нас! 😊</small>
+        </div>
     </div>
 </div>

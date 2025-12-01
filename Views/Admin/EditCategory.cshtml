@@ -1,0 +1,91 @@
+﻿@using WebApp.Entities
+@model Category
+
+@{
+    ViewData["Title"] = "Редагування категорії";
+}
+
+<!-- Container -->
+<div class="container-fixed">
+    <div class="flex flex-wrap items-center lg:items-end justify-between gap-5 pb-7.5">
+        <div class="flex flex-col justify-center gap-2">
+            <h1 class="text-xl font-medium leading-none text-gray-900">
+                Редагування категорії
+            </h1>
+            <div class="flex items-center gap-2 text-sm font-normal text-gray-700">
+                Зміна параметрів категорії
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Container -->
+<div class="container-fixed">
+    <form class="card edit-category-form" asp-controller="Admin" asp-action="UpdateCategory" method="post">
+        <div class="card-header">
+            <h3 class="card-title">
+                @Model.Name
+            </h3>
+        </div>
+        <div class="card-body grid gap-5">
+            <!-- ID -->
+            <div class="flex items-baseline flex-wrap lg:flex-nowrap gap-2.5">
+                <label class="form-label max-w-32">Id</label>
+                <input class="input" name="Id" type="text" value="@Model.Id" readonly />
+            </div>
+
+            <!-- Name -->
+            <div class="flex items-baseline flex-wrap lg:flex-nowrap gap-2.5">
+                <label class="form-label max-w-32">Name</label>
+                <input class="input" name="Name" type="text" value="@Model.Name" />
+            </div>
+
+            <!-- Slug -->
+            <div class="flex items-baseline flex-wrap lg:flex-nowrap gap-2.5">
+                <label class="form-label max-w-32">Slug</label>
+                <input class="input" name="Slug" type="text" value="@Model.Slug" />
+            </div>
+
+            <!-- Description -->
+            <div class="flex items-baseline flex-wrap lg:flex-nowrap gap-2.5">
+                <label class="form-label max-w-32">Description</label>
+                <textarea class="input" name="Description" rows="3">@Model.Description</textarea>
+            </div>
+
+            <!-- ImageSrc -->
+            <div class="flex items-baseline flex-wrap lg:flex-nowrap gap-2.5">
+                <label class="form-label max-w-32">Image URL</label>
+                <input class="input" name="ImageSrc" type="text" value="@(Model.ImageSrc ?? "")" />
+            </div>
+
+            <!-- Parent Category -->
+            <div class="flex items-baseline flex-wrap gap-2.5">
+                <label class="form-label max-w-32">Parent Category</label>
+                <div class="flex flex-col items-start grow gap-5">
+                    <select class="select parent-category-select" name="ParentID">
+                        <option value="">-- No Parent --</option>
+                        @foreach (var category in ViewBag.AllCategories)
+                        {
+                            @if (Model.ParentID == category.Id)
+                            {
+                                <option value="@category.Id" selected>@category.Name</option>
+                            }
+                            else
+                            {
+                                <option value="@category.Id">@category.Name</option>
+                            }
+                        }
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="card-footer justify-center">
+            <button class="btn btn-sm btn-primary" type="submit">
+                Зберегти зміни
+            </button>
+            <a class="btn btn-sm btn-light" href="/Admin/Categories">
+                Скасувати
+            </a>
+        </div>
+    </form>
+</div>

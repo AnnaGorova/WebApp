@@ -17,38 +17,87 @@
         <div class="scrollable-y-hover grow shrink-0 flex ps-2 lg:ps-5 pe-1 lg:pe-3" data-scrollable="true" data-scrollable-dependencies="#sidebar_header" data-scrollable-height="auto" data-scrollable-offset="0px" data-scrollable-wrappers="#sidebar_content" id="sidebar_scrollable">
             <!-- Sidebar Menu -->
             <div class="menu flex flex-col grow gap-0.5" data-menu="true" data-menu-accordion-expand-all="false" id="sidebar_menu">
-                <div class="menu-item" data-menu-item-toggle="accordion" >
-                    <div class="menu-link flex items-center grow cursor-pointer border border-transparent gap-[10px] ps-[10px] pe-[10px] py-[6px]" tabindex="0">
-                        <span class="menu-icon items-start text-gray-500 dark:text-gray-400 w-[20px]">
-                           
-                           
-
-                                <i class="ki-filled ki-element-11 text-lg">
-                            </i>
+                <!-- Dashboards -->
+                <div class="menu-item">
+                    <a class="menu-link gap-2.5 py-2 px-2.5 rounded-md menu-item-active:bg-gray-100 menu-link-hover:bg-gray-100" href="/Admin/Index">
+                        <span class="menu-icon items-start text-gray-400 text-lg menu-item-here:text-gray-900 menu-item-show:text-gray-900 menu-link-hover:text-gray-900">
+                            <i class="ki-filled ki-element-11"></i>
                         </span>
+                        <span class="menu-title font-medium text-sm text-gray-700 menu-item-here:text-gray-900 menu-item-show:text-gray-900 menu-link-hover:text-gray-900">
+                            Dashboards
+                        </span>
+                    </a>
+                </div>
 
 
-                        <a href="/Admin/Index">
-                            <span class="menu-title text-sm font-medium text-gray-800 menu-item-active:text-primary menu-link-hover:!text-primary">
-                                Dashboards
-                            </span>
-                        </a>
-                    
+
+
+                <!-- Налаштування з розгортуваним меню -->
+                <div class="menu-item" data-menu-item-toggle="accordion" data-menu-item-trigger="click">
+                    <div class="menu-link gap-2.5 py-2 px-2.5 rounded-md !menu-item-hover:bg-transparent !menu-item-here:bg-transparent">
+                        <span class="menu-icon items-start text-gray-400 text-lg menu-item-here:text-gray-900 menu-item-show:text-gray-900 menu-link-hover:text-gray-900">
+                            <i class="ki-filled ki-setting-2"></i>
+                        </span>
+                        <span class="menu-title font-medium text-sm text-gray-700 menu-item-here:text-gray-900 menu-item-show:text-gray-900 menu-link-hover:text-gray-900">
+                            Налаштування
+                        </span>
+                        <span class="menu-arrow text-gray-400 menu-item-here:text-gray-400 menu-item-show:text-gray-800 menu-link-hover:text-gray-800">
+                            <i class="ki-filled ki-down text-3xs menu-item-show:hidden"></i>
+                            <i class="ki-filled ki-up text-3xs hidden menu-item-show:inline-flex"></i>
+                        </span>
                     </div>
 
-                </div>
-                <div class="menu-item" data-menu-item-toggle="accordion" >
-                    <div class="menu-link flex items-center grow cursor-pointer border border-transparent gap-[10px] ps-[10px] pe-[10px] py-[6px]" tabindex="0">
-                        <span class="menu-icon items-start text-gray-500 dark:text-gray-400 w-[20px]">
-                            <i class="ki-filled ki-setting-2 text-lg">
-                            </i>
-                        </span>
+                    <div class="menu-accordion gap-px ps-7">
+                        <!-- Config -->
+                        <div class="menu-item">
+                            <a class="menu-link py-2 px-2.5 rounded-md menu-item-active:bg-gray-100 menu-link-hover:bg-gray-100" href="/Admin/Config">
+                                <span class="menu-title text-2sm text-gray-800 menu-item-active:font-medium menu-item-active:text-gray-900 menu-link-hover:text-gray-900">
+                                    Опції
+                                </span>
+                            </a>
+                        </div>
 
-                        <a href="/Admin/Config">
-                            <span class="menu-title text-sm font-medium text-gray-800 menu-item-active:text-primary menu-link-hover:!text-primary">
-                                Налаштування 
-                            </span>
-                        </a>
+                        <!-- Blog -->
+                        <div class="menu-item" data-menu-item-toggle="accordion" data-menu-item-trigger="click">
+                            <div class="menu-link py-2 px-2.5 rounded-md border border-transparent !menu-item-here:bg-transparent">
+                                <span class="menu-title text-2sm text-gray-800 menu-item-here:text-gray-900 menu-item-show:text-gray-900 menu-link-hover:text-gray-900">
+                                    Блог
+                                </span>
+                                <span class="menu-arrow text-gray-400 menu-item-here:text-gray-400 menu-item-show:text-gray-800 menu-link-hover:text-gray-800">
+                                    <i class="ki-filled ki-down text-3xs menu-item-show:hidden"></i>
+                                    <i class="ki-filled ki-up text-3xs hidden menu-item-show:inline-flex"></i>
+                                </span>
+                            </div>
+
+                            <div class="menu-accordion gap-px ps-2.5">
+                                <!-- Categories -->
+                                <div class="menu-item">
+                                    <a class="menu-link py-2 px-2.5 rounded-md menu-item-active:bg-gray-100 menu-link-hover:bg-gray-100" href="/Admin/Categories">
+                                        <span class="menu-title text-2sm text-gray-800 menu-item-active:font-medium menu-item-active:text-gray-900 menu-link-hover:text-gray-900">
+                                            Categories
+                                        </span>
+                                    </a>
+                                </div>
+
+                                <!-- Tags -->
+                                <div class="menu-item">
+                                    <a class="menu-link py-2 px-2.5 rounded-md menu-item-active:bg-gray-100 menu-link-hover:bg-gray-100" href="/Admin/Tags">
+                                        <span class="menu-title text-2sm text-gray-800 menu-item-active:font-medium menu-item-active:text-gray-900 menu-link-hover:text-gray-900">
+                                            Tags
+                                        </span>
+                                    </a>
+                                </div>
+
+                                <!-- Posts -->
+                                <div class="menu-item">
+                                    <a class="menu-link py-2 px-2.5 rounded-md menu-item-active:bg-gray-100 menu-link-hover:bg-gray-100" href="/Admin/Posts">
+                                        <span class="menu-title text-2sm text-gray-800 menu-item-active:font-medium menu-item-active:text-gray-900 menu-link-hover:text-gray-900">
+                                            Posts
+                                        </span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -56,3 +105,6 @@
         </div>
     </div>
 </div>
+
+
+

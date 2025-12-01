@@ -1,0 +1,105 @@
+﻿@using WebApp.Entities
+@model Tag
+
+@{
+    ViewData["Title"] = "Редагування тегу";
+}
+
+<!-- Container -->
+<div class="container-fixed">
+    <div class="flex flex-wrap items-center lg:items-end justify-between gap-5 pb-7.5">
+        <div class="flex flex-col justify-center gap-2">
+            <h1 class="text-xl font-medium leading-none text-gray-900">
+                Редагування тегу
+            </h1>
+            <div class="flex items-center gap-2 text-sm font-normal text-gray-700">
+                Зміна параметрів тегу
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Container -->
+<div class="container-fixed">
+    <form class="card edit-tag-form" asp-controller="Admin" asp-action="UpdateTag" method="post">
+        <div class="card-header">
+            <h3 class="card-title">
+                @Model.Name
+            </h3>
+        </div>
+        <div class="card-body grid gap-5">
+            <!-- ID -->
+            <div class="flex items-baseline flex-wrap lg:flex-nowrap gap-2.5">
+                <label class="form-label max-w-32">Id</label>
+                <input class="input" name="Id" type="text" value="@Model.Id" readonly />
+            </div>
+
+            <!-- Name -->
+            <div class="flex items-baseline flex-wrap lg:flex-nowrap gap-2.5">
+                <label class="form-label max-w-32">Назва тегу</label>
+                <input class="input" name="Name" type="text" value="@Model.Name" placeholder="Введіть назву тегу" required />
+            </div>
+
+            <!-- Slug -->
+            <div class="flex items-baseline flex-wrap lg:flex-nowrap gap-2.5">
+                <label class="form-label max-w-32">Slug</label>
+                <input class="input" name="Slug" type="text" value="@Model.Slug" placeholder="Введіть slug" />
+                
+            </div>
+
+            <!-- Preview -->
+            <div class="flex items-baseline flex-wrap lg:flex-nowrap gap-2.5">
+                <label class="form-label max-w-32">Попередній перегляд</label>
+                <div class="flex items-center gap-2">
+                    <span class="badge badge-primary badge-outline rounded-[30px]">
+                        <span class="size-1.5 rounded-full bg-primary me-1.5"></span>
+                        <span id="tagPreview">@Model.Name</span>
+                    </span>
+                </div>
+            </div>
+        </div>
+        <div class="card-footer justify-center gap-2.5">
+            <button class="btn btn-sm btn-primary" type="submit">
+                <i class="ki-filled ki-check"></i>
+                Зберегти зміни
+            </button>
+            <a class="btn btn-sm btn-light" href="/Admin/Tags">
+                <i class="ki-filled ki-cross"></i>
+                Скасувати
+            </a>
+        </div>
+    </form>
+</div>
+
+
+<script src="~/assets/js/editTag.js"></script>
+
+@*
+<script>
+    // Динамічний попередній перегляд тегу
+    document.addEventListener('DOMContentLoaded', function() {
+        const nameInput = document.querySelector('input[name="Name"]');
+        const previewElement = document.getElementById('tagPreview');
+
+        nameInput.addEventListener('input', function() {
+            previewElement.textContent = this.value || '@Model.Name';
+        });
+
+        // Автогенерація slug з назви
+        const slugInput = document.querySelector('input[name="Slug"]');
+        nameInput.addEventListener('blur', function() {
+            if (!slugInput.value) {
+                // Генеруємо slug з назви
+                const slug = this.value
+                    .toLowerCase()
+                    .replace(/\s+/g, '-')
+                    .replace(/[^\w\-]+/g, '')
+                    .replace(/\-\-+/g, '-')
+                    .replace(/^-+/, '')
+                    .replace(/-+$/, '');
+                slugInput.value = slug;
+            }
+        });
+    });
+</script>
+*@

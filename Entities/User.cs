@@ -63,5 +63,14 @@ namespace WebApp.Entities
 
         [ValidateNever]
         public DateTime? DateOfUpdated { get; set; } = null;
+
+
+
+
+
+
+        public string? ResetPasswordCode { get; set; }
+        public DateTime? ResetPasswordCodeExpires { get; set; }
+
     }
 }

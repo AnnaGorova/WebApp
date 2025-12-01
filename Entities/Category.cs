@@ -11,16 +11,19 @@ namespace WebApp.Entities
         public string Description { get; set; } = string.Empty;
         public string ImageSrc { get; set; } = string.Empty;
 
-        [ForeignKey("ParentNavigate")]
-        [Display(Name = "Батьківський пункт")]
-        public int? ParentID { get; set; } = null;
+        /// Foreign Key - зберігає ID батьківської категорії (число)
+        public int? ParentID { get; set; }
 
-        /// <summary>
-        /// Батьківський навігаційний пункт (для навігаційної властивості)
-        /// </summary>
-        public virtual Category? ParentCategory { get; set; }
-       
+        // Navigation Property - посилається на об'єкт батьківської категорії  
+        [ForeignKey("ParentID")]
+        public virtual Category? ParentCategory
+        {
+            get; set;
+        }
 
+            // Це поле ігноруємо - воно для зворотньої сумісності
+            [NotMapped]
+        public int? ParentCategoryId { get; set; }
 
         public virtual ICollection<PostCategories> PostCategories { get; set; } = new List<PostCategories>();
 

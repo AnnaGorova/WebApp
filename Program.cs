@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 using WebApp.Db;
 using WebApp.Models;
+using WebApp.Services;
 
 namespace WebApp
 {
@@ -11,6 +12,11 @@ namespace WebApp
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
+
+
+            builder.Services.Configure<SmtpGmailConfig>(builder.Configuration.GetSection("SmtpGmailConfig"));
+            builder.Services.AddScoped<IEmailService, EmailService>();
+
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();
@@ -66,18 +72,6 @@ namespace WebApp
                 name: "default",
                 pattern: "{controller=Home}/{action=Index}/{id?}");
 
-
-            app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapControllerRoute(
-                    name: "default",
-                    pattern: "{controller=Home}/{action=Index}/{id?}");
-
-                endpoints.MapControllerRoute(
-                    name: "account",
-                    pattern: "Account/{action=Login}",
-                    defaults: new { controller = "Account" });
-            });
 
             app.Run();
         }
