@@ -1,0 +1,310 @@
+﻿@using WebApp.Entities
+@model List<Post>
+
+@{
+    ViewData["Title"] = "Управління постами";
+}
+
+<!-- Container -->
+<div class="container-fixed">
+    <div class="flex flex-wrap items-center lg:items-end justify-between gap-5 pb-7.5">
+        <div class="flex flex-col justify-center gap-2">
+            <h1 class="text-xl font-medium leading-none text-gray-900">
+                Управління постами
+            </h1>
+            <div class="flex items-center gap-2 text-sm font-normal text-gray-700">
+                Керування постами блогу
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Container -->
+<div class="container-fixed">
+    <div class="grid gap-5 lg:gap-7.5">
+        <div class="card card-grid min-w-full">
+            <div class="card-header flex-wrap gap-2">
+                <h3 class="card-title font-medium text-sm">
+                    @if (Model != null)
+                    {
+                        <text>Showing @Model.Count posts</text>
+                    }
+                    else
+                    {
+                        <text>No posts found</text>
+                    }
+                </h3>
+                @if (Model != null && Model.Any())
+                {
+                    <div class="flex flex-wrap gap-2 lg:gap-5">
+                        <div class="flex">
+                            <label class="input input-sm">
+                                <i class="ki-filled ki-magnifier"></i>
+                                <input data-datatable-search="#posts_table" placeholder="Search posts" type="text" value="">
+                            </label>
+                        </div>
+                        <div class="flex flex-wrap gap-2.5">
+                            <a class="btn btn-sm btn-success" href="/Admin/CreatePost">
+                                <i class="ki-filled ki-plus-squared"></i>
+                                Новий пост
+                            </a>
+                        </div>
+                    </div>
+                }
+            </div>
+
+            <div class="card-body">
+                @if (Model == null || !Model.Any())
+                {
+                    <div class="text-center py-10">
+                        <i class="ki-filled ki-document text-4xl text-gray-400 mb-4"></i>
+                        <h3 class="text-lg font-medium text-gray-900 mb-2">No posts found</h3>
+                        <p class="text-gray-600">There are no posts in the database yet.</p>
+                    </div>
+                }
+                else
+                {
+                    <div data-datatable="true" data-datatable-state-save="false" id="posts_table">
+                        <div class="scrollable-x-auto">
+                            <table class="table table-auto table-border" data-datatable-table="true">
+                                <thead>
+                                    <tr>
+                                        <th class="w-[60px] text-center">ID</th>
+                                        <th class="min-w-[200px]">Name</th>
+                                        <th class="min-w-[150px]">Slug</th>
+                                        <th class="min-w-[250px]">Description</th>
+                                        <th class="min-w-[120px]">Image</th>
+                                        <th class="min-w-[300px]">Context</th>
+                                        <th class="min-w-[100px]">Status</th>
+                                        <th class="min-w-[150px]">Created</th>
+                                        <th class="min-w-[150px]">Updated</th>
+                                        <th class="min-w-[150px]">Published</th>
+                                        <th class="min-w-[120px] text-center">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (Post post in Model)
+                                    {
+                                        <tr>
+                                            <!-- Id -->
+                                            <td class="text-center">@post.Id</td>
+
+                                            <!-- Name -->
+                                            <td>
+                                                <div class="flex items-center gap-2">
+                                                    @if (!string.IsNullOrEmpty(post.ImageSrc))
+                                                    {
+                                                        <img src="@post.ImageSrc" alt="@post.Name" class="w-8 h-8 rounded object-cover">
+                                                    }
+                                                    <span class="font-medium">@post.Name</span>
+                                                </div>
+                                            </td>
+
+                                            <!-- Slug -->
+                                            <td class="text-gray-800 font-normal">
+                                                <code class="text-sm bg-gray-100 px-2 py-1 rounded">@post.Slug</code>
+                                            </td>
+
+                                            <!-- Description -->
+                                            <td>
+                                                @if (!string.IsNullOrEmpty(post.Description))
+                                                {
+                                                    <div class="max-w-xs truncate" title="@post.Description">
+                                                        @if (post.Description.Length > 80)
+                                                        {
+                                                            <span class="text-sm">@post.Description.Substring(0, 80)...</span>
+                                                        }
+                                                        else
+                                                        {
+                                                            <span class="text-sm">@post.Description</span>
+                                                        }
+                                                    </div>
+                                                }
+                                                else
+                                                {
+                                                    <span class="text-gray-400 italic text-sm">No description</span>
+                                                }
+                                            </td>
+
+                                            <!-- ImageSrc -->
+                                            <td>
+                                                @if (!string.IsNullOrEmpty(post.ImageSrc))
+                                                {
+                                                    <div class="flex justify-center">
+                                                        <img src="@post.ImageSrc" alt="Image"
+                                                             class="w-12 h-12 rounded object-cover cursor-pointer hover:opacity-80 transition"
+                                                             onclick="window.open('@post.ImageSrc', '_blank')"
+                                                             title="Click to view image">
+                                                    </div>
+                                                }
+                                                else
+                                                {
+                                                    <span class="text-gray-400 italic text-sm">No image</span>
+                                                }
+                                            </td>
+
+                                            <!-- Context -->
+                                            <td>
+                                                @if (!string.IsNullOrEmpty(post.Context))
+                                                {
+                                                    <div class="max-w-xs truncate" title="@post.Context">
+                                                        @if (post.Context.Length > 100)
+                                                        {
+                                                            <span class="text-sm">@Html.Raw(post.Context.Substring(0, 100))...</span>
+                                                        }
+                                                        else
+                                                        {
+                                                            <span class="text-sm">@Html.Raw(post.Context)</span>
+                                                        }
+                                                    </div>
+                                                }
+                                                else
+                                                {
+                                                    <span class="text-gray-400 italic text-sm">No content</span>
+                                                }
+                                            </td>
+
+                                            <!-- PostStatuses -->
+                                            <td>
+                                                @if (post.PostStatuses == PostStatuses.Published)
+                                                {
+                                                    <span class="badge badge-success badge-outline rounded-[30px]">
+                                                        <span class="size-1.5 rounded-full bg-success me-1.5"></span>
+                                                        Published
+                                                    </span>
+                                                }
+                                                else if (post.PostStatuses == PostStatuses.Draft)
+                                                {
+                                                    <span class="badge badge-warning badge-outline rounded-[30px]">
+                                                        <span class="size-1.5 rounded-full bg-warning me-1.5"></span>
+                                                        Draft
+                                                    </span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge badge-secondary badge-outline rounded-[30px]">
+                                                        <span class="size-1.5 rounded-full bg-secondary me-1.5"></span>
+                                                        Created
+                                                    </span>
+                                                }
+                                            </td>
+
+                                            <!-- DataOfCreated -->
+                                            <td class="text-gray-600 text-sm">
+                                                <div title="Created at: @post.DataOfCreated.ToString("dd.MM.yyyy HH:mm:ss")">
+                                                    @post.DataOfCreated.ToString("dd.MM.yyyy HH:mm")
+                                                </div>
+                                            </td>
+
+                                            <!-- DataOfUpdated -->
+                                            <td class="text-gray-600 text-sm">
+                                                <div title="Updated at: @post.DataOfUpdated.ToString("dd.MM.yyyy HH:mm:ss")">
+                                                    @post.DataOfUpdated.ToString("dd.MM.yyyy HH:mm")
+                                                </div>
+                                            </td>
+
+                                            <!-- DataOfPublished -->
+                                            <td class="text-gray-600 text-sm">
+                                                <div title="Published at: @post.DataOfPublished.ToString("dd.MM.yyyy HH:mm:ss")">
+                                                    @post.DataOfPublished.ToString("dd.MM.yyyy HH:mm")
+                                                </div>
+                                            </td>
+
+                                            <!-- Actions -->
+                                            <td class="text-center">
+                                                <div class="flex items-center justify-center gap-2">
+                                                    <a class="btn btn-sm btn-icon btn-light"
+                                                       href="/Admin/EditPost?postId=@post.Id"
+                                                       title="Edit post">
+                                                        <i class="ki-filled ki-pencil"></i>
+                                                    </a>
+                                                    <button class="btn btn-sm btn-icon btn-light remove_post_button"
+                                                            data-post-id="@post.Id"
+                                                            data-post-name="@post.Name"
+                                                            data-post-slug="@post.Slug"
+                                                            title="Видалити пост">
+                                                        <i class="ki-filled ki-trash"></i>
+                                                    </button>
+                                                    @*
+                                                        <a class="btn btn-sm btn-icon btn-light"
+                                                        href="/Post/@post.Slug"
+                                                        target="_blank"
+                                                        title="View post">
+                                                        <i class="ki-filled ki-eye"></i>
+                                                        </a>
+                                                    *@
+                                                   
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="card-footer justify-center md:justify-between flex-col md:flex-row gap-5 text-gray-600 text-2sm font-medium">
+                            <div class="flex items-center gap-2 order-2 md:order-1">
+                                Show
+                                <select class="select select-sm w-16" data-datatable-size="true" name="perpage"></select>
+                                per page
+                            </div>
+                            <div class="flex items-center gap-4 order-1 md:order-2">
+                                <span data-datatable-info="true"></span>
+                                <div class="pagination" data-datatable-pagination="true"></div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Remove Post -->
+<div class="modal" data-modal="true" id="remove_post_modal" style="background-color: dimgray">
+    <div class="modal-content max-w-[600px] top-[15%]">
+        <div class="modal-header py-4 px-5 justify-end">
+            <button class="btn btn-sm btn-icon btn-light btn-clear shrink-0" data-modal-dismiss="true">
+                <i class="ki-filled ki-cross"></i>
+            </button>
+        </div>
+        <div class="modal-body p-0 pb-5" style="background-color: black">
+            <div class="scrollable-y-auto" data-scrollable="true" data-scrollable-max-height="auto" data-scrollable-offset="300px">
+                <div id="remove_post_modal_content">
+                    <div class="menu menu-default p-0 flex-col">
+                        <div class="menu-item">
+                            <div class="menu-link flex items-center justify-between gap-2">
+                                <div class="flex items-center grow gap-2 justify-center">
+                                    <div class="flex flex-col gap-0.5">
+                                        <span class="text-2sm font-semibold text-gray-900">
+                                            Ви дійсно хочете видалити пост?
+                                        </span>
+                                        <div class="text-sm text-gray-700 mt-2">
+                                            Пост: <span id="post_name_display" class="font-medium"></span>
+                                        </div>
+                                        <div class="text-xs text-gray-500 mt-1">
+                                            ID: <span id="post_id_display"></span>
+                                        </div>
+                                        <small class="text-red-500 text-xs mt-2">
+                                            ⚠️ Увага! Ця дія є незворотною. Разом з постом будуть видалені всі коментарі.
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex flex-wrap gap-2.5 px-4 pt-2 justify-center">
+                            <button class="btn btn-sm btn-success remove_post_form_button_cancel">
+                                Закрити
+                            </button>
+                            <button class="btn btn-sm btn-danger remove_post_form_button_confirm">
+                                Видалити
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="~/assets/js/jquery-3.7.1.min.js"></script>
+<script src="~/assets/js/removePost.js"></script>

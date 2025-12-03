@@ -71,6 +71,6 @@ namespace WebApp.Entities
 
         public string? ResetPasswordCode { get; set; }
         public DateTime? ResetPasswordCodeExpires { get; set; }
-
+        public bool ResetPasswordCodeUsed { get; set; }
     }
 }

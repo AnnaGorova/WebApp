@@ -71,6 +71,7 @@ namespace WebApp.Controllers
                 var identity = new ClaimsIdentity(claims, "CookieAuth", ClaimsIdentity.DefaultNameClaimType, ClaimsIdentity.DefaultRoleClaimType);
                 HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(identity));
 
+                TempData["LoginSuccess"] = $"Вітаємо, {user.Login}! Ви успішно увійшли в систему.";
 
 
                 // ПЕРЕВІРКА: адмін чи звичайний користувач
@@ -448,7 +449,7 @@ namespace WebApp.Controllers
         //}
 
 
-
+       
 
 
 
@@ -554,7 +555,7 @@ namespace WebApp.Controllers
                     _agencyDBContext.Users.Update(user);
                     await _agencyDBContext.SaveChangesAsync();
 
-                    TempData["SuccessMessage"] = "Пароль успішно змінено!";
+                    //TempData["SuccessMessage"] = "Пароль успішно змінено!";
                     return RedirectToAction("LoginIn");
                 }
                 else

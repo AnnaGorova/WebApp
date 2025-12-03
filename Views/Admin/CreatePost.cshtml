@@ -1,0 +1,154 @@
+﻿@model WebApp.Entities.Post
+@using WebApp.Entities
+
+@{
+    ViewData["Title"] = "Створення нового посту";
+    var categories = ViewData["Categories"] as List<Category> ?? new List<Category>();
+    var tags = ViewData["Tags"] as List<Tag> ?? new List<Tag>();
+}
+
+<!-- Container -->
+<div class="container-fixed">
+    <form class="card edit-post-form" asp-controller="Admin" asp-action="CreatePost"
+          method="post" enctype="multipart/form-data">
+
+        <div class="card-header">
+            <h3 class="card-title">
+                Новий пост
+            </h3>
+        </div>
+
+        <div class="card-body grid gap-5">
+            @if (TempData["SuccessMessage"] != null)
+            {
+                <div class="alert alert-success mb-4">
+                    @TempData["SuccessMessage"]
+                </div>
+            }
+
+            @if (TempData["ErrorMessage"] != null)
+            {
+                <div class="alert alert-danger mb-4">
+                    @TempData["ErrorMessage"]
+                </div>
+            }
+
+            <!-- Name -->
+            <div class="flex items-baseline flex-wrap lg:flex-nowrap gap-2.5">
+                <label class="form-label max-w-32">Назва *</label>
+                <input class="input" name="Name" type="text" value="@Model.Name" required
+                       placeholder="Введіть назву посту" />
+            </div>
+
+            <!-- Slug -->
+            <div class="flex items-baseline flex-wrap lg:flex-nowrap gap-2.5">
+                <label class="form-label max-w-32">Slug *</label>
+                <input class="input" id="slugInput" name="Slug" type="text" value="@Model.Slug" required
+                       placeholder="post-url-slug" />
+            </div>
+
+            <!-- Description -->
+            <div class="flex items-baseline flex-wrap lg:flex-nowrap gap-2.5">
+                <label class="form-label max-w-32">Опис</label>
+                <textarea class="input" name="Description" rows="3"
+                          placeholder="Короткий опис посту...">@Model.Description</textarea>
+            </div>
+
+            <!-- Category - ОДНА категорія -->
+            <div class="flex items-baseline flex-wrap lg:flex-nowrap gap-2.5">
+                <label class="form-label max-w-32">Категорія *</label>
+                <select class="select" name="SelectedCategoryIds" required>
+                    <option value="">Виберіть категорію</option>
+                    @foreach (var category in categories)
+                    {
+                        <option value="@category.Id">@category.Name</option>
+                    }
+                </select>
+            </div>
+
+            <!-- Tags - чекбокси -->
+            <div class="flex items-baseline flex-wrap lg:flex-nowrap gap-2.5">
+                <label class="form-label max-w-32">Теги</label>
+                <div class="grow">
+                    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 p-3 border border-gray-200 rounded-lg max-h-60 overflow-y-auto">
+                        @foreach (var tag in tags)
+                        {
+                            <label class="flex items-center space-x-2 cursor-pointer hover:bg-gray-50 p-2 rounded">
+                                <input type="checkbox" name="SelectedTagIds" value="@tag.Id" class="h-4 w-4 text-blue-600 rounded" />
+                                <span class="text-sm">@tag.Name</span>
+                            </label>
+                        }
+                        @if (!tags.Any())
+                        {
+                            <div class="col-span-full text-center text-gray-500 py-4">
+                                Теги відсутні. <a href="/Admin/Tags" class="text-blue-500 hover:underline">Створити теги</a>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <!-- ImageSrc -->
+            <div class="flex items-baseline flex-wrap lg:flex-nowrap gap-2.5">
+                <label class="form-label max-w-32">Зображення</label>
+                <div class="flex flex-col grow gap-2">
+                    <!-- Поле для URL -->
+                    <input id="imageInput"
+                           class="input"
+                           name="ImageSrc"
+                           type="text"
+                           value="@Model.ImageSrc"
+                           placeholder="/img/blog-1.jpg"
+                           oninput="updateImagePreviewFromUrl(this.value)" />
+
+                    <!-- Поле для файлу -->
+                    <div class="mt-2">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Або завантажте файл</label>
+                        <input type="file"
+                               id="imageFileInput"
+                               name="ImageFile"
+                               class="input"
+                               accept="image/*"
+                               onchange="updateImagePreviewFromFile(this)" />
+                    </div>
+
+                    <!-- Контейнер для превью -->
+                    <div class="mt-2">
+                        <div id="imagePreviewContainer">
+                            <div id="noImageMessage" class="text-sm text-gray-400 italic">
+                                Введіть URL або виберіть файл для попереднього перегляду
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- PostStatuses -->
+            <div class="flex items-baseline flex-wrap lg:flex-nowrap gap-2.5">
+                <label class="form-label max-w-32">Статус *</label>
+                <select class="select" name="PostStatuses" required>
+                    <option value="0">Створено</option>
+                    <option value="2">Чернетка</option>
+                    <option value="1">Опубліковано</option>
+                </select>
+            </div>
+
+            <!-- Context -->
+            <div class="flex items-baseline flex-wrap lg:flex-nowrap gap-2.5">
+                <label class="form-label max-w-32">Контент *</label>
+                <textarea class="input" name="Context" rows="6" required
+                          placeholder="Повний текст посту...">@Model.Context</textarea>
+            </div>
+        </div>
+
+        <div class="card-footer justify-center">
+            <button class="btn btn-sm btn-success" type="submit">
+                Створити пост
+            </button>
+            <a class="btn btn-sm btn-light" href="/Admin/Posts">
+                Скасувати
+            </a>
+        </div>
+    </form>
+</div>
+
+<script src="/assets/js/createPost.js"></script>

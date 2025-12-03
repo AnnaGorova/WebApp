@@ -1,0 +1,158 @@
+﻿@model WebApp.Entities.Post
+@using WebApp.Entities
+
+@{
+    ViewData["Title"] = "Редагування посту";
+}
+
+<!-- Container -->
+<div class="container-fixed">
+    <div class="flex flex-wrap items-center lg:items-end justify-between gap-5 pb-7.5">
+        <div class="flex flex-col justify-center gap-2">
+            <h1 class="text-xl font-medium leading-none text-gray-900">
+                Редагування посту
+            </h1>
+            <div class="flex items-center gap-2 text-sm font-normal text-gray-700">
+                Зміна параметрів посту
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Container -->
+<div class="container-fixed">
+    <form class="card edit-post-form" asp-controller="Admin" asp-action="UpdatePost" 
+        method="post" enctype="multipart/form-data">
+        <div class="card-header">
+            <h3 class="card-title">
+                @Model.Name
+            </h3>
+        </div>
+
+        <div class="card-body grid gap-5">
+            @if (TempData["SuccessMessage"] != null)
+            {
+                <div class="alert alert-success mb-4">
+                    @TempData["SuccessMessage"]
+                </div>
+            }
+
+            @if (TempData["ErrorMessage"] != null)
+            {
+                <div class="alert alert-danger mb-4">
+                    @TempData["ErrorMessage"]
+                </div>
+            }
+
+            <!-- ID -->
+            <div class="flex items-baseline flex-wrap lg:flex-nowrap gap-2.5">
+                <label class="form-label max-w-32">ID</label>
+                <input class="input" name="Id" type="text" value="@Model.Id" readonly />
+            </div>
+
+            <!-- Name -->
+            <div class="flex items-baseline flex-wrap lg:flex-nowrap gap-2.5">
+                <label class="form-label max-w-32">Назва *</label>
+                <input class="input" name="Name" type="text" value="@Model.Name" required />
+            </div>
+
+            <!-- Slug -->
+            <div class="flex items-baseline flex-wrap lg:flex-nowrap gap-2.5">
+                <label class="form-label max-w-32">Slug *</label>
+                <input class="input" name="Slug" type="text" value="@Model.Slug" required />
+            </div>
+
+            <!-- Description -->
+            <div class="flex items-baseline flex-wrap lg:flex-nowrap gap-2.5">
+                <label class="form-label max-w-32">Опис</label>
+                <textarea class="input" name="Description" rows="3">@Model.Description</textarea>
+            </div>
+
+            <!-- ImageSrc -->
+            <div class="flex items-baseline flex-wrap lg:flex-nowrap gap-2.5">
+                <label class="form-label max-w-32">Зображення</label>
+                <div class="flex flex-col grow gap-2">
+                    <!-- Поле для введення URL -->
+                    <input id="imageInput"
+                           class="input"
+                           name="ImageSrc"
+                           type="text"
+                           value="@Model.ImageSrc"
+                           placeholder="/img/blog-1.jpg"
+                           oninput="updateImagePreview(this.value)" />
+
+                    <!-- Контейнер для превью -->
+                    <div class="mt-2">
+                        <div id="imagePreviewContainer">
+                            @if (!string.IsNullOrEmpty(Model.ImageSrc))
+                            {
+                                <div class="image-preview-wrapper">
+                                    <div class="text-xs text-gray-500 mb-1">Попередній перегляд:</div>
+                                    <img id="previewImage"
+                                         src="@Model.ImageSrc"
+                                         alt="Попередній перегляд"
+                                         class="w-32 h-32 object-cover rounded border"
+                                         onerror="showImageError()">
+                                    <div id="imageError" class="text-xs text-red-500 mt-1" style="display: none;">
+                                        ⚠️ Не вдалося завантажити зображення
+                                    </div>
+                                </div>
+                            }
+                            else
+                            {
+                                <div id="noImageMessage" class="text-sm text-gray-400 italic">
+                                    Введіть URL зображення для попереднього перегляду
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PostStatuses -->
+            <div class="flex items-baseline flex-wrap lg:flex-nowrap gap-2.5">
+                <label class="form-label max-w-32">Статус *</label>
+                <select class="select" name="PostStatuses" required>
+                    <option value="0" selected="@(Model.PostStatuses == PostStatuses.Created)">Створено</option>
+                    <option value="2" selected="@(Model.PostStatuses == PostStatuses.Draft)">Чернетка</option>
+                    <option value="1" selected="@(Model.PostStatuses == PostStatuses.Published)">Опубліковано</option>
+                </select>
+            </div>
+
+            <!-- Context -->
+            <div class="flex items-baseline flex-wrap lg:flex-nowrap gap-2.5">
+                <label class="form-label max-w-32">Контент *</label>
+                <textarea class="input" name="Context" rows="6" required>@Model.Context</textarea>
+            </div>
+
+            <!-- DataOfCreated (readonly) -->
+            <div class="flex items-baseline flex-wrap lg:flex-nowrap gap-2.5">
+                <label class="form-label max-w-32">Створено</label>
+                <input class="input" type="text" value="@Model.DataOfCreated.ToString("dd.MM.yyyy HH:mm")" readonly />
+            </div>
+
+            <!-- DataOfUpdated (readonly) -->
+            <div class="flex items-baseline flex-wrap lg:flex-nowrap gap-2.5">
+                <label class="form-label max-w-32">Оновлено</label>
+                <input class="input" type="text" value="@Model.DataOfUpdated.ToString("dd.MM.yyyy HH:mm")" readonly />
+            </div>
+
+            <!-- DataOfPublished (readonly) -->
+            <div class="flex items-baseline flex-wrap lg:flex-nowrap gap-2.5">
+                <label class="form-label max-w-32">Опубліковано</label>
+                <input class="input" type="text" value="@Model.DataOfPublished.ToString("dd.MM.yyyy HH:mm")" readonly />
+            </div>
+        </div>
+
+        <div class="card-footer justify-center">
+            <button class="btn btn-sm btn-primary" type="submit">
+                Зберегти зміни
+            </button>
+            <a class="btn btn-sm btn-light" href="/Admin/Posts">
+                Скасувати
+            </a>
+        </div>
+    </form>
+</div>
+
+<script src="~/assets/js/editPost.js"></script>

@@ -599,6 +599,320 @@ namespace WebApp.Controllers
 
         }
 
-    }
 
+
+
+
+        public IActionResult Posts()
+        {
+            var posts = _agencyDBContext.Posts?.ToList();
+
+            return View(posts);
+        }
+
+
+        [HttpGet]
+        public IActionResult EditPost(int postId)
+        {
+            var post = _agencyDBContext.Posts
+                .FirstOrDefault(p => p.Id == postId);
+            if (post == null)
+            {
+                return RedirectToAction("Posts");
+            }
+
+            return View(post);
+        }
+
+        //[HttpPost]
+        //public IActionResult UpdatePost(Post post)
+        //{
+        //    try
+        //    {
+
+        //        var existingPost = _agencyDBContext.Posts
+        //            .FirstOrDefault(p => p.Id == post.Id);
+
+        //        if (existingPost == null)
+        //        {
+
+        //            return RedirectToAction("Posts");
+        //        }
+
+
+        //        existingPost.Name = post.Name ?? "";
+        //        existingPost.Slug = post.Slug ?? "";
+        //        existingPost.Description = post.Description ?? "";
+        //        existingPost.ImageSrc = post.ImageSrc ?? "";
+        //        existingPost.Context = post.Context ?? "";
+        //        existingPost.PostStatuses = post.PostStatuses;
+        //        existingPost.DataOfUpdated = DateTime.Now;
+        //        existingPost.DataOfPublished = post.DataOfPublished;
+        //        existingPost.DataOfCreated = post.DataOfCreated;
+
+        //        _agencyDBContext.SaveChanges();
+        //        return RedirectToAction("Posts");
+
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        TempData["ErrorMessage"] = "Помилка: " + ex.Message;
+        //        return RedirectToAction("EditPost", new { postId = post.Id });
+        //    }
+
+
+        //}
+
+        [HttpPost]
+        public IActionResult UpdatePost(Post post, IFormFile ImageFile)
+        {
+            try
+            {
+                var existingPost = _agencyDBContext.Posts
+                    .FirstOrDefault(p => p.Id == post.Id);
+
+                if (existingPost == null)
+                {
+                    TempData["ErrorMessage"] = "Пост не знайдено";
+                    return RedirectToAction("Posts");
+                }
+
+                // Оновлюємо поля
+                existingPost.Name = post.Name ?? "";
+                existingPost.Slug = post.Slug ?? "";
+                existingPost.Description = post.Description ?? "";
+                existingPost.Context = post.Context ?? "";
+                existingPost.PostStatuses = post.PostStatuses;
+                existingPost.DataOfUpdated = DateTime.Now;
+
+                // Оновлюємо зображення, якщо завантажено нове
+                if (ImageFile != null && ImageFile.Length > 0)
+                {
+                    var fileName = Guid.NewGuid().ToString() + Path.GetExtension(ImageFile.FileName);
+                    var uploadsPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "img");
+
+                    if (!Directory.Exists(uploadsPath))
+                    {
+                        Directory.CreateDirectory(uploadsPath);
+                    }
+
+                    var filePath = Path.Combine(uploadsPath, fileName);
+
+                    using (var stream = new FileStream(filePath, FileMode.Create))
+                    {
+                        ImageFile.CopyTo(stream);
+                    }
+
+                    existingPost.ImageSrc = "/img/" + fileName; // Правильний шлях
+                }
+                else if (!string.IsNullOrEmpty(post.ImageSrc))
+                {
+                    // Якщо файл не завантажено, але є URL
+                    existingPost.ImageSrc = post.ImageSrc;
+                }
+
+                _agencyDBContext.SaveChanges();
+
+               
+                return RedirectToAction("Posts");
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = "Помилка: " + ex.Message;
+                return RedirectToAction("EditPost", new { postId = post.Id });
+            }
+        }
+
+
+        [HttpGet]
+        public IActionResult CreatePost()
+        {
+            // Отримуємо категорії та теги для випадаючих списків
+            var categories = _agencyDBContext.Categories?.ToList() ?? new List<Category>();
+            var tags = _agencyDBContext.Tags?.ToList() ?? new List<Tag>();
+
+            ViewData["Categories"] = categories;
+            ViewData["Tags"] = tags;
+
+            return View(new Post());
+        }
+
+        [HttpPost]
+        public IActionResult CreatePost(Post post, IFormFile ImageFile, List<int> SelectedCategoryIds, List<int> SelectedTagIds)
+        {
+            try
+            {
+                // Валідація обов'язкових полів
+                if (string.IsNullOrEmpty(post.Name))
+                {
+                    TempData["ErrorMessage"] = "Назва посту обов'язкова";
+                    return RedirectToAction("CreatePost");
+                }
+
+                if (string.IsNullOrEmpty(post.Slug))
+                {
+                    TempData["ErrorMessage"] = "Slug обов'язковий";
+                    return RedirectToAction("CreatePost");
+                }
+
+                // Перевірка унікальності слага
+                var existingPost = _agencyDBContext.Posts
+                    .FirstOrDefault(p => p.Slug == post.Slug);
+
+                if (existingPost != null)
+                {
+                    TempData["ErrorMessage"] = "Пост з таким Slug вже існує";
+                    return RedirectToAction("CreatePost");
+                }
+
+                // Перевірка категорій
+                if (SelectedCategoryIds == null || !SelectedCategoryIds.Any())
+                {
+                    TempData["ErrorMessage"] = "Виберіть хоча б одну категорію";
+                    return RedirectToAction("CreatePost");
+                }
+
+                // Обробка зображення
+                if (ImageFile != null && ImageFile.Length > 0)
+                {
+                    var fileName = Guid.NewGuid().ToString() + Path.GetExtension(ImageFile.FileName);
+                    var uploadsPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "img");
+
+                    if (!Directory.Exists(uploadsPath))
+                    {
+                        Directory.CreateDirectory(uploadsPath);
+                    }
+
+                    var filePath = Path.Combine(uploadsPath, fileName);
+
+                    using (var stream = new FileStream(filePath, FileMode.Create))
+                    {
+                        ImageFile.CopyTo(stream);
+                    }
+
+                    post.ImageSrc = "/img/" + fileName;
+                }
+                else if (string.IsNullOrEmpty(post.ImageSrc))
+                {
+                    post.ImageSrc = "/img/default-post.jpg"; // Дефолтне зображення
+                }
+
+                // Встановлення дат
+                post.DataOfCreated = DateTime.Now;
+                post.DataOfUpdated = DateTime.Now;
+
+                if (post.PostStatuses == PostStatuses.Published)
+                {
+                    post.DataOfPublished = DateTime.Now;
+                }
+
+                // Створення посту (спочатку без зв'язків)
+                _agencyDBContext.Posts?.Add(post);
+                _agencyDBContext.SaveChanges(); // Зберігаємо, щоб отримати Id
+
+                // Додавання зв'язків з категоріями через проміжну таблицю
+                foreach (var categoryId in SelectedCategoryIds)
+                {
+                    var categoryExists = _agencyDBContext.Categories?.Any(c => c.Id == categoryId) ?? false;
+                    if (categoryExists)
+                    {
+                        var postCategory = new PostCategories
+                        {
+                            PostId = post.Id,
+                            CategoryId = categoryId
+                        };
+                        _agencyDBContext.PostCategories?.Add(postCategory);
+                    }
+                }
+
+                // Додавання зв'язків з тегами через проміжну таблицю
+                if (SelectedTagIds != null && SelectedTagIds.Any())
+                {
+                    foreach (var tagId in SelectedTagIds)
+                    {
+                        var tagExists = _agencyDBContext.Tags?.Any(t => t.Id == tagId) ?? false;
+                        if (tagExists)
+                        {
+                            var postTag = new PostTags
+                            {
+                                PostId = post.Id,
+                                TagId = tagId
+                            };
+                            _agencyDBContext.PostTags?.Add(postTag);
+                        }
+                    }
+                }
+
+                // Зберігаємо всі зв'язки
+                _agencyDBContext.SaveChanges();
+
+                
+                return RedirectToAction("Posts");
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = "Помилка при створенні посту: " + ex.Message;
+
+                // Повертаємо категорії та теги для повторного відображення
+                var categories = _agencyDBContext.Categories?.ToList() ?? new List<Category>();
+                var tags = _agencyDBContext.Tags?.ToList() ?? new List<Tag>();
+
+                ViewData["Categories"] = categories;
+                ViewData["Tags"] = tags;
+
+                return View(post);
+            }
+        }
+
+
+
+
+
+
+
+        [HttpPost]
+        public IActionResult DeletePost(int postId)
+        {
+            try
+            {
+                var post = _agencyDBContext.Posts?.FirstOrDefault(p => p.Id == postId);
+
+                if (post == null)
+                {
+                    return Json(new { success = false, message = "Пост не знайдено" });
+                }
+
+                // Видаляємо зв'язки з категоріями
+                var postCategories = _agencyDBContext.PostCategories?.Where(pc => pc.PostId == postId).ToList();
+                if (postCategories != null && postCategories.Any())
+                {
+                    _agencyDBContext.PostCategories?.RemoveRange(postCategories);
+                }
+
+                // Видаляємо зв'язки з тегами
+                var postTags = _agencyDBContext.PostTags?.Where(pt => pt.PostId == postId).ToList();
+                if (postTags != null && postTags.Any())
+                {
+                    _agencyDBContext.PostTags?.RemoveRange(postTags);
+                }
+
+                // Видаляємо коментарі (якщо є таблиця коментарів)
+                var comments = _agencyDBContext.Comments?.Where(c => c.PostId == postId).ToList();
+                if (comments != null && comments.Any())
+                {
+                    _agencyDBContext.Comments?.RemoveRange(comments);
+                }
+
+                // Видаляємо сам пост
+                _agencyDBContext.Posts?.Remove(post);
+                _agencyDBContext.SaveChanges();
+
+                return Json(new { success = true, message = "Пост успішно видалено" });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = $"Помилка при видаленні: {ex.Message}" });
+            }
+        }
+    }
 }
