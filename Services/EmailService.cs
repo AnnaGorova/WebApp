@@ -55,24 +55,24 @@ namespace WebApp.Services
         private string GeneratePasswordResetEmailBody(string userName, string resetCode)
         {
             return $@"
-<div style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;'>
-    <div style='background: #007bff; color: white; padding: 20px; text-align: center;'>
-        <h1>Відновлення пароля</h1>
-    </div>
-    <div style='padding: 20px; background: #f9f9f9;'>
-        <p>Шановний(а) <strong>{userName}</strong>,</p>
-        <p>Ми отримали запит на відновлення пароля для вашого облікового запису.</p>
-        <p>Використовуйте наступний код для відновлення пароля:</p>
-        <div style='font-size: 24px; font-weight: bold; color: #007bff; text-align: center; margin: 20px 0; padding: 10px; background: white; border: 2px dashed #007bff;'>
-            {resetCode}
-        </div>
-        <p>Цей код дійсний протягом <strong>15 хвилин</strong>.</p>
-        <p>Якщо ви не запитували відновлення пароля, проігноруйте цей лист.</p>
-    </div>
-    <div style='text-align: center; padding: 20px; font-size: 12px; color: #666;'>
-        <p>© 2024 Your App Name. Всі права захищені.</p>
-    </div>
-</div>";
+                    <div style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;'>
+                        <div style='background: #007bff; color: white; padding: 20px; text-align: center;'>
+                            <h1>Відновлення пароля</h1>
+                        </div>
+                        <div style='padding: 20px; background: #f9f9f9;'>
+                            <p>Шановний(а) <strong>{userName}</strong>,</p>
+                            <p>Ми отримали запит на відновлення пароля для вашого облікового запису.</p>
+                            <p>Використовуйте наступний код для відновлення пароля:</p>
+                            <div style='font-size: 24px; font-weight: bold; color: #007bff; text-align: center; margin: 20px 0; padding: 10px; background: white; border: 2px dashed #007bff;'>
+                                {resetCode}
+                            </div>
+                            <p>Цей код дійсний протягом <strong>15 хвилин</strong>.</p>
+                            <p>Якщо ви не запитували відновлення пароля, проігноруйте цей лист.</p>
+                        </div>
+                        <div style='text-align: center; padding: 20px; font-size: 12px; color: #666;'>
+                            <p>© 2024 Your App Name. Всі права захищені.</p>
+                        </div>
+                    </div>";
         }
     }
 }

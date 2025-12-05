@@ -610,20 +610,45 @@ namespace WebApp.Controllers
             return View(posts);
         }
 
+        //*********************************************************
 
-        [HttpGet]
         public IActionResult EditPost(int postId)
         {
             var post = _agencyDBContext.Posts
+                .Include(p => p.PostTags)
+                    .ThenInclude(pt => pt.Tag)
+                .Include(p => p.PostCategories)
+                    .ThenInclude(pc => pc.Category)
                 .FirstOrDefault(p => p.Id == postId);
+
             if (post == null)
             {
+                TempData["ErrorMessage"] = "Пост не знайдено";
                 return RedirectToAction("Posts");
             }
+
+            // Завантажуємо всі теги та категорії для вибору
+            ViewBag.Tags = _agencyDBContext.Tags.ToList();
+            ViewBag.Categories = _agencyDBContext.Categories.ToList();
 
             return View(post);
         }
 
+
+
+        //[HttpGet]
+        //public IActionResult EditPost(int postId)
+        //{
+        //    var post = _agencyDBContext.Posts
+        //        .FirstOrDefault(p => p.Id == postId);
+        //    if (post == null)
+        //    {
+        //        return RedirectToAction("Posts");
+        //    }
+
+        //    return View(post);
+        //}
+        //залиш закоментовано
         //[HttpPost]
         //public IActionResult UpdatePost(Post post)
         //{
@@ -663,12 +688,82 @@ namespace WebApp.Controllers
 
         //}
 
+        //[HttpPost]
+        //public IActionResult UpdatePost(Post post, IFormFile ImageFile)
+        //{
+        //    try
+        //    {
+        //        var existingPost = _agencyDBContext.Posts
+        //            .FirstOrDefault(p => p.Id == post.Id);
+
+        //        if (existingPost == null)
+        //        {
+        //            TempData["ErrorMessage"] = "Пост не знайдено";
+        //            return RedirectToAction("Posts");
+        //        }
+
+        //        // Оновлюємо поля
+        //        existingPost.Name = post.Name ?? "";
+        //        existingPost.Slug = post.Slug ?? "";
+        //        existingPost.Description = post.Description ?? "";
+        //        existingPost.Context = post.Context ?? "";
+        //        existingPost.PostStatuses = post.PostStatuses;
+        //        existingPost.DataOfUpdated = DateTime.Now;
+
+        //        // Оновлюємо зображення, якщо завантажено нове
+        //        if (ImageFile != null && ImageFile.Length > 0)
+        //        {
+        //            var fileName = Guid.NewGuid().ToString() + Path.GetExtension(ImageFile.FileName);
+        //            var uploadsPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "img");
+
+        //            if (!Directory.Exists(uploadsPath))
+        //            {
+        //                Directory.CreateDirectory(uploadsPath);
+        //            }
+
+        //            var filePath = Path.Combine(uploadsPath, fileName);
+
+        //            using (var stream = new FileStream(filePath, FileMode.Create))
+        //            {
+        //                ImageFile.CopyTo(stream);
+        //            }
+
+        //            existingPost.ImageSrc = "/img/" + fileName; // Правильний шлях
+        //        }
+        //        else if (!string.IsNullOrEmpty(post.ImageSrc))
+        //        {
+        //            // Якщо файл не завантажено, але є URL
+        //            existingPost.ImageSrc = post.ImageSrc;
+        //        }
+
+        //        _agencyDBContext.SaveChanges();
+
+
+        //        return RedirectToAction("Posts");
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        TempData["ErrorMessage"] = "Помилка: " + ex.Message;
+        //        return RedirectToAction("EditPost", new { postId = post.Id });
+        //    }
+        //}
+
         [HttpPost]
-        public IActionResult UpdatePost(Post post, IFormFile ImageFile)
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> UpdatePost(
+            Post post,
+            IFormFile? ImageFile = null,
+            List<int>? SelectedTagIds = null,
+            List<int>? SelectedCategoryIds = null)
         {
             try
             {
+                // Знаходимо існуючий пост з залежностями
                 var existingPost = _agencyDBContext.Posts
+                    .Include(p => p.PostTags)
+                    .ThenInclude(pt => pt.Tag)
+                    .Include(p => p.PostCategories)
+                    .ThenInclude(pc => pc.Category)
                     .FirstOrDefault(p => p.Id == post.Id);
 
                 if (existingPost == null)
@@ -677,51 +772,228 @@ namespace WebApp.Controllers
                     return RedirectToAction("Posts");
                 }
 
-                // Оновлюємо поля
-                existingPost.Name = post.Name ?? "";
-                existingPost.Slug = post.Slug ?? "";
+                // Дебаг логування
+                Console.WriteLine($"=== ОНОВЛЕННЯ ПОСТУ ===");
+                Console.WriteLine($"ID: {post.Id}");
+                Console.WriteLine($"Назва: {post.Name}");
+                Console.WriteLine($"Slug: {post.Slug}");
+                Console.WriteLine($"Description: {post.Description}");
+                Console.WriteLine($"ImageFile: {(ImageFile != null ? ImageFile.FileName : "null")}");
+                Console.WriteLine($"ImageSrc: {post.ImageSrc}");
+                Console.WriteLine($"PostStatuses: {post.PostStatuses}");
+                Console.WriteLine($"SelectedTagIds: {(SelectedTagIds != null ? string.Join(", ", SelectedTagIds) : "null")}");
+                Console.WriteLine($"SelectedCategoryIds: {(SelectedCategoryIds != null ? string.Join(", ", SelectedCategoryIds) : "null")}");
+                Console.WriteLine($"=====================");
+
+                // ОНОВЛЕННЯ ОСНОВНИХ ПОЛІВ
+                existingPost.Name = post.Name;
+                existingPost.Slug = post.Slug;
                 existingPost.Description = post.Description ?? "";
                 existingPost.Context = post.Context ?? "";
                 existingPost.PostStatuses = post.PostStatuses;
                 existingPost.DataOfUpdated = DateTime.Now;
 
-                // Оновлюємо зображення, якщо завантажено нове
+                // ОНОВЛЕННЯ ЗОБРАЖЕННЯ
+                // 1. Якщо завантажено новий файл
                 if (ImageFile != null && ImageFile.Length > 0)
                 {
-                    var fileName = Guid.NewGuid().ToString() + Path.GetExtension(ImageFile.FileName);
-                    var uploadsPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "img");
+                    Console.WriteLine($"Обробка завантаженого файлу: {ImageFile.FileName}, Size: {ImageFile.Length} bytes");
 
-                    if (!Directory.Exists(uploadsPath))
+                    // Перевірка типу файлу
+                    var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif", ".bmp", ".webp" };
+                    var fileExtension = Path.GetExtension(ImageFile.FileName).ToLowerInvariant();
+
+                    if (!allowedExtensions.Contains(fileExtension))
                     {
-                        Directory.CreateDirectory(uploadsPath);
+                        TempData["ErrorMessage"] = "Дозволені лише файли зображень (JPG, PNG, GIF, BMP, WEBP)";
+                        ViewBag.Tags = await _agencyDBContext.Tags.ToListAsync();
+                        ViewBag.Categories = await _agencyDBContext.Categories.ToListAsync();
+                        return View("EditPost", post);
                     }
 
-                    var filePath = Path.Combine(uploadsPath, fileName);
+                    // Перевірка розміру файлу (макс. 10MB)
+                    if (ImageFile.Length > 10 * 1024 * 1024)
+                    {
+                        TempData["ErrorMessage"] = "Розмір файлу не повинен перевищувати 10MB";
+                        ViewBag.Tags = await _agencyDBContext.Tags.ToListAsync();
+                        ViewBag.Categories = await _agencyDBContext.Categories.ToListAsync();
+                        return View("EditPost", post);
+                    }
 
+                    // Створюємо папку для завантажень
+                    var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads");
+                    if (!Directory.Exists(uploadsFolder))
+                    {
+                        Directory.CreateDirectory(uploadsFolder);
+                        Console.WriteLine($"Створено папку: {uploadsFolder}");
+                    }
+
+                    // Генеруємо унікальне ім'я файлу
+                    var fileName = Guid.NewGuid().ToString() + fileExtension;
+                    var filePath = Path.Combine(uploadsFolder, fileName);
+
+                    Console.WriteLine($"Зберігаємо файл: {filePath}");
+
+                    // Зберігаємо файл
                     using (var stream = new FileStream(filePath, FileMode.Create))
                     {
-                        ImageFile.CopyTo(stream);
+                        await ImageFile.CopyToAsync(stream);
                     }
 
-                    existingPost.ImageSrc = "/img/" + fileName; // Правильний шлях
+                    // Оновлюємо шлях до зображення
+                    existingPost.ImageSrc = "/uploads/" + fileName;
+                    Console.WriteLine($"Оновлено ImageSrc: {existingPost.ImageSrc}");
                 }
+                // 2. Якщо не завантажено файл, але є URL в полі ImageSrc
                 else if (!string.IsNullOrEmpty(post.ImageSrc))
                 {
-                    // Якщо файл не завантажено, але є URL
                     existingPost.ImageSrc = post.ImageSrc;
+                    Console.WriteLine($"Використано URL з ImageSrc: {post.ImageSrc}");
+                }
+                // 3. Якщо ні файлу, ні URL - зберігаємо старе значення
+                else
+                {
+                    Console.WriteLine($"Залишено старе зображення: {existingPost.ImageSrc}");
                 }
 
-                _agencyDBContext.SaveChanges();
+                // ОНОВЛЕННЯ ТЕГІВ
+                Console.WriteLine($"Оновлення тегів...");
 
-               
-                return RedirectToAction("Posts");
+                // Видаляємо всі існуючі теги поста
+                if (existingPost.PostTags.Any())
+                {
+                    _agencyDBContext.PostTags.RemoveRange(existingPost.PostTags);
+                    Console.WriteLine($"Видалено старих тегів: {existingPost.PostTags.Count}");
+                }
+
+                // Додаємо нові теги, якщо вони обрані
+                if (SelectedTagIds != null && SelectedTagIds.Any())
+                {
+                    Console.WriteLine($"Додаємо нові теги: {string.Join(", ", SelectedTagIds)}");
+
+                    foreach (var tagId in SelectedTagIds)
+                    {
+                        // Перевіряємо, чи існує такий тег
+                        var tagExists = await _agencyDBContext.Tags.AnyAsync(t => t.Id == tagId);
+                        if (tagExists)
+                        {
+                            var postTag = new PostTags
+                            {
+                                PostId = existingPost.Id,
+                                TagId = tagId
+                            };
+                            _agencyDBContext.PostTags.Add(postTag);
+                            Console.WriteLine($"Додано тег з ID: {tagId}");
+                        }
+                        else
+                        {
+                            Console.WriteLine($"Тег з ID {tagId} не знайдено в базі даних");
+                        }
+                    }
+                }
+                else
+                {
+                    Console.WriteLine($"Теги не обрані");
+                }
+
+                // ОНОВЛЕННЯ КАТЕГОРІЙ
+                Console.WriteLine($"Оновлення категорій...");
+
+                // Видаляємо всі існуючі категорії поста
+                if (existingPost.PostCategories.Any())
+                {
+                    _agencyDBContext.PostCategories.RemoveRange(existingPost.PostCategories);
+                    Console.WriteLine($"Видалено старих категорій: {existingPost.PostCategories.Count}");
+                }
+
+                // Додаємо нові категорії, якщо вони обрані
+                if (SelectedCategoryIds != null && SelectedCategoryIds.Any())
+                {
+                    Console.WriteLine($"Додаємо нові категорії: {string.Join(", ", SelectedCategoryIds)}");
+
+                    foreach (var categoryId in SelectedCategoryIds)
+                    {
+                        // Перевіряємо, чи існує така категорія
+                        var categoryExists = await _agencyDBContext.Categories.AnyAsync(c => c.Id == categoryId);
+                        if (categoryExists)
+                        {
+                            var postCategory = new PostCategories
+                            {
+                                PostId = existingPost.Id,
+                                CategoryId = categoryId
+                            };
+                            _agencyDBContext.PostCategories.Add(postCategory);
+                            Console.WriteLine($"Додано категорію з ID: {categoryId}");
+                        }
+                        else
+                        {
+                            Console.WriteLine($"Категорія з ID {categoryId} не знайдено в базі даних");
+                        }
+                    }
+                }
+                else
+                {
+                    Console.WriteLine($"Категорії не обрані");
+                }
+
+                // ОНОВЛЕННЯ ДАТИ ПУБЛІКАЦІЇ
+                // Якщо пост став опублікованим і дата публікації ще не встановлена
+                if (existingPost.PostStatuses == PostStatuses.Published &&
+                    existingPost.DataOfPublished == default)
+                {
+                    existingPost.DataOfPublished = DateTime.Now;
+                    Console.WriteLine($"Встановлено дату публікації: {existingPost.DataOfPublished}");
+                }
+
+                // ЗБЕРЕЖЕННЯ ЗМІН
+                Console.WriteLine($"Зберігаємо зміни в базі даних...");
+                await _agencyDBContext.SaveChangesAsync();
+
+                TempData["SuccessMessage"] = $"Пост '{post.Name}' успішно оновлено!";
+                return RedirectToAction("EditPost", new { postId = post.Id });
+            }
+            catch (DbUpdateException dbEx)
+            {
+                // Обробка помилок бази даних
+                var errorMessage = dbEx.InnerException?.Message ?? dbEx.Message;
+                Console.WriteLine($"Помилка бази даних: {errorMessage}");
+                TempData["ErrorMessage"] = $"Помилка бази даних: {errorMessage}";
+
+                // Завантажуємо теги та категорії для повторного відображення форми
+                ViewBag.Tags = await _agencyDBContext.Tags.ToListAsync();
+                ViewBag.Categories = await _agencyDBContext.Categories.ToListAsync();
+
+                return View("EditPost", post);
+            }
+            catch (IOException ioEx)
+            {
+                // Обробка помилок файлової системи
+                Console.WriteLine($"Помилка файлової системи: {ioEx.Message}");
+                TempData["ErrorMessage"] = $"Помилка збереження файлу: {ioEx.Message}";
+
+                ViewBag.Tags = await _agencyDBContext.Tags.ToListAsync();
+                ViewBag.Categories = await _agencyDBContext.Categories.ToListAsync();
+
+                return View("EditPost", post);
             }
             catch (Exception ex)
             {
-                TempData["ErrorMessage"] = "Помилка: " + ex.Message;
-                return RedirectToAction("EditPost", new { postId = post.Id });
+                // Загальна обробка помилок
+                Console.WriteLine($"Загальна помилка: {ex.Message}");
+                Console.WriteLine($"Stack Trace: {ex.StackTrace}");
+                TempData["ErrorMessage"] = $"Помилка: {ex.Message}";
+
+                // Завантажуємо теги та категорії для повторного відображення форми
+                ViewBag.Tags = await _agencyDBContext.Tags.ToListAsync();
+                ViewBag.Categories = await _agencyDBContext.Categories.ToListAsync();
+
+                return View("EditPost", post);
             }
         }
+
+
+
+
 
 
         [HttpGet]

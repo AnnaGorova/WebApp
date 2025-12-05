@@ -62,6 +62,7 @@
                 <input class="input" name="Slug" type="text" value="@Model.Slug" required />
             </div>
 
+
             <!-- Description -->
             <div class="flex items-baseline flex-wrap lg:flex-nowrap gap-2.5">
                 <label class="form-label max-w-32">Опис</label>
@@ -72,14 +73,23 @@
             <div class="flex items-baseline flex-wrap lg:flex-nowrap gap-2.5">
                 <label class="form-label max-w-32">Зображення</label>
                 <div class="flex flex-col grow gap-2">
-                    <!-- Поле для введення URL -->
+                    <!-- Поле для URL -->
                     <input id="imageInput"
                            class="input"
                            name="ImageSrc"
                            type="text"
                            value="@Model.ImageSrc"
-                           placeholder="/img/blog-1.jpg"
-                           oninput="updateImagePreview(this.value)" />
+                           placeholder="/img/blog-1.jpg" />
+
+                    <!-- Поле для файлу -->
+                    <div class="mt-2">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Або завантажте файл</label>
+                        <input type="file"
+                               id="imageFileInput"
+                               name="ImageFile"
+                               class="input"
+                               accept="image/*" />
+                    </div>
 
                     <!-- Контейнер для превью -->
                     <div class="mt-2">
@@ -87,12 +97,11 @@
                             @if (!string.IsNullOrEmpty(Model.ImageSrc))
                             {
                                 <div class="image-preview-wrapper">
-                                    <div class="text-xs text-gray-500 mb-1">Попередній перегляд:</div>
-                                    <img id="previewImage"
-                                         src="@Model.ImageSrc"
+                                    <div class="text-xs text-gray-500 mb-1">Поточне зображення:</div>
+                                    <img src="@Model.ImageSrc"
                                          alt="Попередній перегляд"
                                          class="w-32 h-32 object-cover rounded border"
-                                         onerror="showImageError()">
+                                         onerror="this.style.display='none'; document.getElementById('imageError').style.display='block';">
                                     <div id="imageError" class="text-xs text-red-500 mt-1" style="display: none;">
                                         ⚠️ Не вдалося завантажити зображення
                                     </div>
@@ -101,7 +110,7 @@
                             else
                             {
                                 <div id="noImageMessage" class="text-sm text-gray-400 italic">
-                                    Введіть URL зображення для попереднього перегляду
+                                    Введіть URL або виберіть файл для попереднього перегляду
                                 </div>
                             }
                         </div>
@@ -119,11 +128,75 @@
                 </select>
             </div>
 
+            
+
+
+            <!-- Теги -->
+            <div class="flex items-baseline flex-wrap lg:flex-nowrap gap-2.5">
+                <label class="form-label max-w-32">Теги</label>
+                <div class="grow">
+                    <select id="tagsSelect" name="SelectedTagIds" class="select" multiple style="height: 150px;">
+                        @foreach (var tag in ViewBag.Tags as List<Tag> ?? new List<Tag>())
+                        {
+                            var isSelected = Model.PostTags?.Any(pt => pt.TagId == tag.Id) ?? false;
+                            <option value="@tag.Id" selected="@isSelected">@tag.Name</option>
+                        }
+                    </select>
+                    <div class="text-xs text-gray-500 mt-1">
+                        Утримуйте Ctrl для вибору кількох тегів
+                    </div>
+                </div>
+            </div>
+
+            <!-- Категорії -->
+            <div class="flex items-baseline flex-wrap lg:flex-nowrap gap-2.5">
+                <label class="form-label max-w-32">Категорії</label>
+                <div class="grow">
+                    <select id="categoriesSelect" name="SelectedCategoryIds" class="select" multiple style="height: 150px;">
+                        @foreach (var category in ViewBag.Categories as List<Category> ?? new List<Category>())
+                        {
+                            var isSelected = Model.PostCategories?.Any(pc => pc.CategoryId == category.Id) ?? false;
+                            <option value="@category.Id" selected="@isSelected">@category.Name</option>
+                        }
+                    </select>
+                    <div class="text-xs text-gray-500 mt-1">
+                        Утримуйте Ctrl для вибору кількох категорій
+                    </div>
+                </div>
+            </div>
+
+
+
+
+            @*
             <!-- Context -->
             <div class="flex items-baseline flex-wrap lg:flex-nowrap gap-2.5">
-                <label class="form-label max-w-32">Контент *</label>
-                <textarea class="input" name="Context" rows="6" required>@Model.Context</textarea>
+            <label class="form-label max-w-32">Контент *</label>
+            <textarea class="input" name="Context" rows="6" required>@Model.Context</textarea>
             </div>
+            *@
+            
+            <!-- Контент з WYSIWYG редактором -->
+            
+                <div class="flex items-baseline flex-wrap lg:flex-nowrap gap-2.5">
+                    <label class="form-label max-w-32">Контент *</label>
+                    <div class="grow">
+                        <!-- Приховане поле для форми (зберігає HTML) -->
+                        <textarea id="contextInput" name="Context" style="display: none;">@Html.Raw(Model.Context)</textarea>
+
+                        <!-- Контейнер де буде редактор -->
+                        <div id="editorContainer" class="border rounded-lg">
+                            <!-- Тут буде редактор -->
+                        </div>
+
+                        <div class="text-xs text-gray-500 mt-2">
+                            Натисніть на поле вище для редагування тексту
+                        </div>
+                    </div>
+                </div>
+            
+
+
 
             <!-- DataOfCreated (readonly) -->
             <div class="flex items-baseline flex-wrap lg:flex-nowrap gap-2.5">
@@ -154,5 +227,9 @@
         </div>
     </form>
 </div>
+
+
+
+
 
 <script src="~/assets/js/editPost.js"></script>

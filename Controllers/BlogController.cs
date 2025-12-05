@@ -555,6 +555,88 @@ namespace WebApp.Controllers
             return View(viewModel);
         }
 
+
+
+
+
+
+
+
+
+
+
+
+
+        
+        //[Route("blog/{slug}")]
+        //public IActionResult BlogDetailBySlug(string slug)
+        //{
+        //    // Знаходимо пост за slug
+        //    var post = _context.Posts
+        //        .Include(p => p.PostCategories)
+        //        .ThenInclude(pc => pc.Category)
+        //        .Include(p => p.PostTags)
+        //        .ThenInclude(pt => pt.Tag)
+        //        .Include(p => p.Comments)
+        //        .FirstOrDefault(p => p.Slug == slug && p.PostStatuses == PostStatuses.Published);
+
+        //    if (post == null)
+        //    {
+        //        return NotFound();
+        //    }
+
+        //    // Решта коду така ж як у BlogDetailIndex
+        //    var popularCategories = _context.Categories
+        //        .Where(c => c.PostCategories.Any())
+        //        .Select(c => new
+        //        {
+        //            Category = c,
+        //            PostCount = c.PostCategories.Count()
+        //        })
+        //        .OrderByDescending(x => x.PostCount)
+        //        .Select(x => x.Category)
+        //        .Take(5)
+        //        .ToList();
+
+        //    var popularTags = _context.Tags
+        //        .Where(tag => _context.PostTags.Any(pt => pt.TagId == tag.Id))
+        //        .Select(tag => new
+        //        {
+        //            Tag = tag,
+        //            UsageCount = _context.PostTags.Count(pt => pt.TagId == tag.Id)
+        //        })
+        //        .OrderByDescending(x => x.UsageCount)
+        //        .Select(x => x.Tag)
+        //        .Take(5)
+        //        .ToList();
+
+        //    var recentPosts = _context.Posts
+        //        .Where(p => p.PostStatuses == PostStatuses.Published && p.Slug != slug)
+        //        .OrderByDescending(p => p.DataOfPublished)
+        //        .Take(5)
+        //        .Include(p => p.PostCategories)
+        //        .ThenInclude(pc => pc.Category)
+        //        .Include(p => p.PostTags)
+        //        .ThenInclude(pt => pt.Tag)
+        //        .ToList();
+
+        //    var viewModel = new BlogViewModel
+        //    {
+        //        Posts = new List<Post> { post },
+        //        Categories = popularCategories,
+        //        Tags = popularTags,
+        //        RecentPosts = recentPosts
+        //    };
+
+        //    return View("BlogDetailIndex", viewModel); // Використовуємо той самий View
+        //}
+
+
+
+
+
+
+
     }
 
 

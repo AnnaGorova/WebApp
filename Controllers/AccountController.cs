@@ -481,6 +481,8 @@ namespace WebApp.Controllers
                     // Зберігаємо код
                     user.ResetPasswordCode = resetCode;
                     user.ResetPasswordCodeExpires = DateTime.UtcNow.AddMinutes(15);
+                    user.ResetPasswordCodeUsed = false;
+
                     _agencyDBContext.SaveChanges();
 
                     Console.WriteLine($"✅ Code saved: {resetCode}");
@@ -545,10 +547,12 @@ namespace WebApp.Controllers
 
                 if (user != null &&
                     user.ResetPasswordCode == model.Code &&
-                    user.ResetPasswordCodeExpires > DateTime.UtcNow)
+                    user.ResetPasswordCodeExpires > DateTime.UtcNow &&
+                    !user.ResetPasswordCodeUsed)
                 {
                     // Код вірний і не прострочений - змінюємо пароль
                     user.PasswordHash = SecurePasswordHasher.Hash(model.Password);
+                    user.ResetPasswordCodeUsed = true;
                     user.ResetPasswordCode = null;
                     user.ResetPasswordCodeExpires = null;
 

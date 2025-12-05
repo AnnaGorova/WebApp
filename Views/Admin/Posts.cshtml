@@ -72,9 +72,16 @@
                                         <th class="w-[60px] text-center">ID</th>
                                         <th class="min-w-[200px]">Name</th>
                                         <th class="min-w-[150px]">Slug</th>
-                                        <th class="min-w-[250px]">Description</th>
+                                        @*
+                                    <       th class="min-w-[250px]">Description</th>
+                                        *@
+                                        
+                                       
                                         <th class="min-w-[120px]">Image</th>
-                                        <th class="min-w-[300px]">Context</th>
+                                        @*
+                                    <       th class="min-w-[300px]">Context</th>
+                                        *@
+                                        
                                         <th class="min-w-[100px]">Status</th>
                                         <th class="min-w-[150px]">Created</th>
                                         <th class="min-w-[150px]">Updated</th>
@@ -104,28 +111,30 @@
                                             <td class="text-gray-800 font-normal">
                                                 <code class="text-sm bg-gray-100 px-2 py-1 rounded">@post.Slug</code>
                                             </td>
-
-                                            <!-- Description -->
-                                            <td>
+                                            @*
+                                                <!-- Description -->
+                                                <td>
                                                 @if (!string.IsNullOrEmpty(post.Description))
                                                 {
-                                                    <div class="max-w-xs truncate" title="@post.Description">
-                                                        @if (post.Description.Length > 80)
-                                                        {
-                                                            <span class="text-sm">@post.Description.Substring(0, 80)...</span>
-                                                        }
-                                                        else
-                                                        {
-                                                            <span class="text-sm">@post.Description</span>
-                                                        }
-                                                    </div>
+                                                <div class="max-w-xs truncate" title="@post.Description">
+                                                @if (post.Description.Length > 80)
+                                                {
+                                                <span class="text-sm">@post.Description.Substring(0, 80)...</span>
                                                 }
                                                 else
                                                 {
-                                                    <span class="text-gray-400 italic text-sm">No description</span>
+                                                <span class="text-sm">@post.Description</span>
                                                 }
-                                            </td>
+                                                </div>
+                                                }
+                                                else
+                                                {
+                                                <span class="text-gray-400 italic text-sm">No description</span>
+                                                }
+                                                </td>
 
+                                            *@
+                                           
                                             <!-- ImageSrc -->
                                             <td>
                                                 @if (!string.IsNullOrEmpty(post.ImageSrc))
@@ -142,27 +151,30 @@
                                                     <span class="text-gray-400 italic text-sm">No image</span>
                                                 }
                                             </td>
+                                            @*
 
-                                            <!-- Context -->
-                                            <td>
+                                                <!-- Context -->
+                                                <td>
                                                 @if (!string.IsNullOrEmpty(post.Context))
                                                 {
-                                                    <div class="max-w-xs truncate" title="@post.Context">
-                                                        @if (post.Context.Length > 100)
-                                                        {
-                                                            <span class="text-sm">@Html.Raw(post.Context.Substring(0, 100))...</span>
-                                                        }
-                                                        else
-                                                        {
-                                                            <span class="text-sm">@Html.Raw(post.Context)</span>
-                                                        }
-                                                    </div>
+                                                <div class="max-w-xs truncate" title="@post.Context">
+                                                @if (post.Context.Length > 100)
+                                                {
+                                                <span class="text-sm">@Html.Raw(post.Context.Substring(0, 100))...</span>
                                                 }
                                                 else
                                                 {
-                                                    <span class="text-gray-400 italic text-sm">No content</span>
+                                                <span class="text-sm">@Html.Raw(post.Context)</span>
                                                 }
-                                            </td>
+                                                </div>
+                                                }
+                                                else
+                                                {
+                                                <span class="text-gray-400 italic text-sm">No content</span>
+                                                }
+                                                </td>
+                                            *@
+                                            
 
                                             <!-- PostStatuses -->
                                             <td>
