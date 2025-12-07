@@ -1,6 +1,8 @@
 ﻿using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.Google;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WebApp.Db;
@@ -12,7 +14,7 @@ using WebApp.ViewModels;
 
 namespace WebApp.Controllers
 {
-
+   
     public class AccountController : Controller
     {
 
@@ -20,12 +22,14 @@ namespace WebApp.Controllers
 
         private UserModel _userModel;
         private readonly IEmailService _emailService;
-
-        public AccountController(AgencyDBContext agencyDBContext, IEmailService emailService)
+        private readonly ILogger<AccountController> _logger;
+        public AccountController(AgencyDBContext agencyDBContext, 
+            IEmailService emailService, ILogger<AccountController> logger)
         {
             _agencyDBContext = agencyDBContext;
             _userModel = new UserModel(_agencyDBContext);
             _emailService = emailService;
+            _logger = logger;
         }
 
 
@@ -476,6 +480,20 @@ namespace WebApp.Controllers
 
                 if (user != null)
                 {
+
+
+                    // ========== ПЕРЕВІРКА: Google-користувач ==========
+                    if (!string.IsNullOrEmpty(user.GoogleId))
+                    {
+                        // Google-користувач не може відновлювати пароль!
+                        TempData["ErrorMessage"] = "Цей акаунт зареєстровано через Google. " +
+                                                  "Для входу використовуйте кнопку 'Увійти через Google'.";
+                        return View(model);
+                    }
+                    // ========== КІНЕЦЬ ПЕРЕВІРКИ ==========
+
+
+
                     var resetCode = new Random().Next(100000, 999999).ToString();
 
                     // Зберігаємо код
@@ -545,26 +563,44 @@ namespace WebApp.Controllers
             {
                 var user = _userModel.GetUserByEmail(model.Email);
 
-                if (user != null &&
-                    user.ResetPasswordCode == model.Code &&
-                    user.ResetPasswordCodeExpires > DateTime.UtcNow &&
-                    !user.ResetPasswordCodeUsed)
+                if (user != null)
                 {
-                    // Код вірний і не прострочений - змінюємо пароль
-                    user.PasswordHash = SecurePasswordHasher.Hash(model.Password);
-                    user.ResetPasswordCodeUsed = true;
-                    user.ResetPasswordCode = null;
-                    user.ResetPasswordCodeExpires = null;
+                    // ========== ПЕРЕВІРКА: Google-користувач ==========
+                    if (!string.IsNullOrEmpty(user.GoogleId))
+                    {
+                        ModelState.AddModelError("", "Цей акаунт зареєстровано через Google. " +
+                                                    "Неможливо змінити пароль для Google-акаунта. " +
+                                                    "Використовуйте кнопку 'Увійти через Google'.");
+                        return View(model);
+                    }
+                    // ========== КІНЕЦЬ ПЕРЕВІРКИ ==========
 
-                    _agencyDBContext.Users.Update(user);
-                    await _agencyDBContext.SaveChangesAsync();
 
-                    //TempData["SuccessMessage"] = "Пароль успішно змінено!";
-                    return RedirectToAction("LoginIn");
+
+                    if (user.ResetPasswordCode == model.Code &&
+                        user.ResetPasswordCodeExpires > DateTime.UtcNow &&
+                        !user.ResetPasswordCodeUsed)
+                    {
+                        // Код вірний і не прострочений - змінюємо пароль
+                        user.PasswordHash = SecurePasswordHasher.Hash(model.Password);
+                        user.ResetPasswordCodeUsed = true;
+                        user.ResetPasswordCode = null;
+                        user.ResetPasswordCodeExpires = null;
+
+                        _agencyDBContext.Users.Update(user);
+                        await _agencyDBContext.SaveChangesAsync();
+
+                        TempData["SuccessMessage"] = "Пароль успішно змінено! Тепер ви можете увійти з новим паролем.";
+                        return RedirectToAction("LoginIn");
+                    }
+                    else
+                    {
+                        ModelState.AddModelError("Code", "Невірний або прострочений код підтвердження");
+                    }
                 }
                 else
                 {
-                    ModelState.AddModelError("Code", "Невірний або прострочений код підтвердження");
+                    ModelState.AddModelError("", "Користувача не знайдено");
                 }
             }
 
@@ -581,7 +617,336 @@ namespace WebApp.Controllers
         //{
         //    return user.Email == "admin@admin.com";
         //}
+
+
+
+
+
+
+
+        [HttpPost]
+        public async Task<IActionResult> LoginIn(string email, string password, string? returnUrl = null)
+        {
+            try
+            {
+                User? user = _userModel.GetUserByEmail(email);
+
+                // Перевірка чи користувач існує
+                if (user == null)
+                {
+                    ViewBag.ErrorMessage = "Невірний email або пароль.";
+                    return View("LoginIn", new ErrorViewModel() { ErrorMessage = "User or Password incorrect" });
+                }
+
+                // ПЕРЕВІРКА: якщо це Google-користувач
+                if (!string.IsNullOrEmpty(user.GoogleId))
+                {
+                    // Google-користувач не може входити по паролю!
+                    TempData["ErrorMessage"] = "Цей акаунт зареєстровано через Google. " +
+                                              "Будь ласка, використовуйте кнопку 'Увійти через Google'";
+                    return View("LoginIn");
+                }
+
+                // Перевірка паролю для звичайних користувачів
+                if (!SecurePasswordHasher.Verify(password, user.PasswordHash))
+                {
+                    ViewBag.ErrorMessage = "Невірний email або пароль.";
+                    return View("LoginIn", new ErrorViewModel() { ErrorMessage = "User or Password incorrect" });
+                }
+
+                // Authentication successful
+                var claims = new List<Claim>
+        {
+            new Claim(ClaimsIdentity.DefaultNameClaimType, user.Email),
+            new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+            new Claim("Login", user.Login)
+        };
+
+                var identity = new ClaimsIdentity(claims, "CookieAuth",
+                    ClaimsIdentity.DefaultNameClaimType,
+                    ClaimsIdentity.DefaultRoleClaimType);
+
+                await HttpContext.SignInAsync(
+                    CookieAuthenticationDefaults.AuthenticationScheme,
+                    new ClaimsPrincipal(identity),
+                    new AuthenticationProperties
+                    {
+                        IsPersistent = true,
+                        ExpiresUtc = DateTime.UtcNow.AddDays(30)
+                    });
+
+                TempData["LoginSuccess"] = $"Вітаємо, {user.Login}! Ви успішно увійшли в систему.";
+
+                // ПЕРЕВІРКА: адмін чи звичайний користувач
+                if (IsAdmin(user))
+                {
+                    return RedirectToAction("Index", "Admin");
+                }
+                else
+                {
+                    return RedirectToAction("Index", "Home");
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "LoginIn error");
+                ViewBag.ErrorMessage = "Сталася помилка при вході.";
+                return View("LoginIn");
+            }
+        }
+
+
+
+
+        [HttpGet]
+        [AllowAnonymous]
+        public IActionResult GoogleLogin(string? returnUrl = null)
+        {
+            try
+            {
+                // Перевіряємо чи є ClientId
+                var configuration = HttpContext.RequestServices.GetRequiredService<IConfiguration>();
+                var clientId = configuration["Authentication:Google:ClientId"];
+
+                if (string.IsNullOrEmpty(clientId) || clientId.Contains("test-client-id"))
+                {
+                    _logger.LogWarning("Google ClientId not configured properly");
+                    TempData["ErrorMessage"] = "Google авторизація не налаштована. Використовується тестовий режим.";
+                    return RedirectToAction("TestGoogleAuth");
+                }
+
+                _logger.LogInformation("Starting REAL Google authentication...");
+
+                var properties = new AuthenticationProperties
+                {
+                    RedirectUri = returnUrl ?? "/Account/GoogleResponse"
+                };
+
+                return Challenge(properties, GoogleDefaults.AuthenticationScheme);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error in GoogleLogin");
+                TempData["ErrorMessage"] = $"Помилка: {ex.Message}";
+                return RedirectToAction("LoginIn");
+            }
+        }
+
+        [HttpGet]
+        [AllowAnonymous]
+        public async Task<IActionResult> GoogleResponse()
+        {
+            try
+            {
+                _logger.LogInformation("=== GOOGLE RESPONSE START ===");
+
+                // 1. Отримати результат від Google через правильну схему
+                var result = await HttpContext.AuthenticateAsync(GoogleDefaults.AuthenticationScheme);
+
+                if (!result?.Succeeded ?? true)
+                {
+                    _logger.LogError("Google authentication failed");
+                    TempData["ErrorMessage"] = "Google authentication failed";
+                    return RedirectToAction("LoginIn");
+                }
+
+                // 2. Отримати дані
+                var email = result.Principal.FindFirst(ClaimTypes.Email)?.Value;
+                var name = result.Principal.FindFirst(ClaimTypes.Name)?.Value;
+                var googleId = result.Principal.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+                _logger.LogInformation($"Received from Google - Email: {email}, Name: {name}, GoogleId: {googleId}");
+
+                if (string.IsNullOrEmpty(email))
+                {
+                    _logger.LogError("No email received from Google");
+                    TempData["ErrorMessage"] = "No email received from Google";
+                    return RedirectToAction("LoginIn");
+                }
+
+                // 3. Знайти або створити користувача
+                var user = await _agencyDBContext.Users
+                    .FirstOrDefaultAsync(u => u.Email == email);
+
+                bool isNewUser = false; // Прапор для нового користувача
+
+                if (user == null)
+                {
+
+                    // Це НОВИЙ користувач
+                    isNewUser = true;
+
+                    // Створити нового користувача
+                    user = new User
+                    {
+                        Email = email,
+                        Login = name ?? email.Split('@')[0],
+                        PasswordHash = SecurePasswordHasher.Hash(Guid.NewGuid().ToString()),
+                        DateOfCreat = DateTime.Now,
+                        GoogleId = googleId
+                    };
+
+                    _agencyDBContext.Users.Add(user);
+                    await _agencyDBContext.SaveChangesAsync();
+                    _logger.LogInformation($"New user created: {email}");
+                }
+                else
+                {
+                    // Це існуючий користувач
+                    // Оновити GoogleId якщо потрібно
+                    if (string.IsNullOrEmpty(user.GoogleId) && !string.IsNullOrEmpty(googleId))
+                    {
+                        user.GoogleId = googleId;
+                        await _agencyDBContext.SaveChangesAsync();
+                    }
+                    _logger.LogInformation($"Existing user found: {email}");
+                }
+
+                // 4. Створити claims для НАШОЇ системи
+                var claims = new List<Claim>
+                {
+                    new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                    new Claim(ClaimTypes.Email, user.Email),
+                    new Claim(ClaimTypes.Name, user.Login),
+                    new Claim("UserId", user.Id.ToString()),
+                    new Claim("Login", user.Login)
+                };
+
+                // Додати роль якщо адмін
+                if (IsAdmin(user))
+                {
+                    claims.Add(new Claim(ClaimTypes.Role, "Admin"));
+                }
+
+                // 5. Створити identity
+                var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+                var principal = new ClaimsPrincipal(identity);
+
+                // 6. ВИХІД з Google сесії
+                //await HttpContext.SignOutAsync(GoogleDefaults.AuthenticationScheme);
+
+                // Очистити тимчасові Google дані
+                await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+
+
+                // 7. ВХІД в нашу систему
+                await HttpContext.SignInAsync(
+                    CookieAuthenticationDefaults.AuthenticationScheme,
+                    principal,
+                    new AuthenticationProperties
+                    {
+                        IsPersistent = true,
+                        ExpiresUtc = DateTime.UtcNow.AddDays(30),
+                       
+                    });
+
+                _logger.LogInformation($"User signed in: {user.Email}");
+
+
+                // ==========  Визначаємо тип повідомлення ==========
+                if (isNewUser)
+                {
+                    return RedirectToAction("Welcome", "Account");
+                }
+                else
+                {
+                    return RedirectToAction("Index", "Home");
+                }
+
+
+
+
+                // 8. Редирект
+                TempData["LoginSuccess"] = $"Welcome, {user.Login}!";
+
+                if (IsAdmin(user))
+                {
+                    return RedirectToAction("Index", "Admin");
+                }
+
+                return RedirectToAction("Index", "Home");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "GoogleResponse error");
+                TempData["ErrorMessage"] = $"Error: {ex.Message}";
+                return RedirectToAction("LoginIn");
+            }
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        [HttpPost("reset-google-password")]
+        public async Task<IActionResult> ResetGooglePassword(string email)
+        {
+            var user = await _agencyDBContext.Users
+                .FirstOrDefaultAsync(u => u.Email == email && !string.IsNullOrEmpty(u.GoogleId));
+
+            if (user == null)
+            {
+                return BadRequest("Користувач не знайдений або не Google-користувач");
+            }
+
+            // Генеруємо новий випадковий пароль (для внутрішніх потреб)
+            var newPassword = Guid.NewGuid().ToString();
+            user.PasswordHash = SecurePasswordHasher.Hash(newPassword);
+            user.DateOfUpdated = DateTime.Now;
+
+            await _agencyDBContext.SaveChangesAsync();
+
+            _logger.LogInformation($"Password reset for Google user: {email}");
+
+            return Ok($"Новий пароль згенеровано (лише для адміністративних потреб)");
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+        [HttpGet]
+        public IActionResult Welcome()
+        {
+            if (!User.Identity.IsAuthenticated)
+            {
+                return RedirectToAction("LoginIn");
+            }
+
+            ViewBag.UserName = User.Identity.Name;
+            ViewBag.Email = User.FindFirst(ClaimTypes.Email)?.Value;
+            ViewBag.IsGoogleUser = !string.IsNullOrEmpty(User.FindFirst("GoogleId")?.Value);
+
+            return View();
+        }
+
+
+
+
+
     }
+
+
 }
 
 

@@ -13,8 +13,10 @@
  </div>*@
 
 
-<form class="card-body flex flex-col gap-5 p-10" id="sign_in_form" method="post" asp-controller="Account" asp-action="CheckUser">
+<form class="card-body flex flex-col gap-5 p-10" id="sign_in_form" 
+    method="post" asp-controller="Account" asp-action="CheckUser" >
     <div class="text-center mb-2.5">
+        @Html.AntiForgeryToken()
         <h3 class="text-lg font-medium text-gray-900 leading-none mb-2.5">
             Sign in
         </h3>
@@ -31,7 +33,10 @@
     
 
     <div class="grid grid-cols-2 gap-2.5">
-        <a class="btn btn-light btn-sm justify-center" href="#">
+        <a class="btn btn-light btn-sm justify-center"
+           asp-controller="Account"
+           asp-action="GoogleLogin">
+            <!-- ТАК ПРАВИЛЬНО -->
             <img alt="" class="size-3.5 shrink-0" src="~/assets/media/brand-logos/google.svg" />
             Use Google
         </a>

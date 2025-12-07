@@ -72,5 +72,9 @@ namespace WebApp.Entities
         public string? ResetPasswordCode { get; set; }
         public DateTime? ResetPasswordCodeExpires { get; set; }
         public bool ResetPasswordCodeUsed { get; set; }
+
+
+
+        public string? GoogleId { get; set; } // Додайте це поле для Google авторизаці
     }
 }

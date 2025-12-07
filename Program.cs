@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
-
+using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.EntityFrameworkCore;
 using WebApp.Db;
 using WebApp.Models;
@@ -14,6 +14,55 @@ namespace WebApp
             var builder = WebApplication.CreateBuilder(args);
 
 
+            builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
+
+            // ========== ÂÀÆËÈÂÎ: ÄÎÄÀªÌÎ GOOGLE ÀÂÒÅÍÒÈÔ²ÊÀÖ²Þ ==========
+            builder.Services.AddAuthentication(options =>
+            {
+                options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = GoogleDefaults.AuthenticationScheme;
+            })
+            .AddCookie(options =>
+            {
+                options.LoginPath = "/Account/LoginIn";
+                options.AccessDeniedPath = "/Error/AccessDenied";
+                options.LogoutPath = "/Account/Logout";
+                options.ExpireTimeSpan = TimeSpan.FromDays(30);
+                options.SlidingExpiration = true;
+            })
+            .AddGoogle(options => // ÖÅÉ ÐßÄÎÊ ÄÎÄÀÉÒÅ!
+            {
+                // Äëÿ òåñòó ìîæåòå âèêîðèñòàòè òåñòîâ³ çíà÷åííÿ
+                options.ClientId = builder.Configuration["Authentication:Google:ClientId"];
+                options.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
+                options.CallbackPath = "/signin-google";
+                options.SaveTokens = true;
+
+                // Äîäàºìî scope äëÿ îòðèìàííÿ email
+                options.Scope.Add("profile");
+                options.Scope.Add("email");
+
+                // Äîäàºìî îáðîáêó ïîä³é äëÿ äåáàãó
+                options.Events = new Microsoft.AspNetCore.Authentication.OAuth.OAuthEvents
+                {
+                    OnRemoteFailure = context =>
+                    {
+                        context.Response.Redirect("/Account/LoginIn?error=" +
+                            Uri.EscapeDataString(context.Failure.Message));
+                        context.HandleResponse();
+                        return Task.CompletedTask;
+                    },
+                    OnAccessDenied = context =>
+                    {
+                        context.Response.Redirect("/Account/LoginIn?error=AccessDenied");
+                        context.HandleResponse();
+                        return Task.CompletedTask;
+                    }
+                };
+            });
+
+
+            // 2. Email ñëóæáà
             builder.Services.Configure<SmtpGmailConfig>(builder.Configuration.GetSection("SmtpGmailConfig"));
             builder.Services.AddScoped<IEmailService, EmailService>();
 
@@ -22,13 +71,13 @@ namespace WebApp
             builder.Services.AddControllersWithViews();
             builder.Services.AddDbContext<AgencyDBContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("AgencyDBConnection")));
 
-            builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(
-                    option =>
-                    {
-                        option.LoginPath = new PathString("/Account/LoginIn");
-                        option.AccessDeniedPath = new PathString("/Error/AccessDenied");  
-                    }
-            );
+            //builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(
+            //        option =>
+            //        {
+            //            option.LoginPath = new PathString("/Account/LoginIn");
+            //            option.AccessDeniedPath = new PathString("/Error/AccessDenied");  
+            //        }
+            //);
                 
 
 
@@ -67,6 +116,11 @@ namespace WebApp
             app.UseAuthentication();
             app.UseAuthorization();
 
+
+            
+
+
+            app.MapControllers();
 
             app.MapControllerRoute(
                 name: "default",

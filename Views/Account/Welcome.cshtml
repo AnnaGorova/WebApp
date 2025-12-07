@@ -1,0 +1,36 @@
+﻿@{
+    ViewData["Title"] = "Ласкаво просимо!";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card text-center">
+                <!-- Зелений фон, чорний текст -->
+                <div class="card-header" style="background-color: #28a745; color: #000000;">
+                    <h2>Вітаємо!</h2>
+                </div>
+
+                <div class="card-body">
+                    <h4 class="card-title">@ViewBag.UserName</h4>
+                    <p class="card-text">Ваш акаунт успішно створено!</p>
+
+                    @if (ViewBag.IsGoogleUser)
+                    {
+                        <!-- Чорний фон, білий текст -->
+                        <div class="alert mt-3" style="background-color: #000000; color: #ffffff;">
+                            <h5>Акаунт Google</h5>
+                            <p>Ваш акаунт підключений до Google.</p>
+                            <p>Для наступних входів використовуйте кнопку "Увійти через Google".</p>
+                        </div>
+                    }
+
+                    <div class="mt-4">
+                        <a href="/" class="btn btn-primary">Перейти на головну</a>
+                        <a href="/Account/Logout" class="btn btn-outline-secondary">Вийти</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
