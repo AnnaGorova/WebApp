@@ -1186,5 +1186,333 @@ namespace WebApp.Controllers
                 return Json(new { success = false, message = $"Помилка при видаленні: {ex.Message}" });
             }
         }
+
+
+
+
+
+        //public IActionResult Navigation()
+        //{
+        //    // Отримуємо всі пункти меню з бази даних
+        //    var allNavigates = _agencyDBContext.Navigates
+        //        .Include(n => n.Childs)
+        //        .OrderBy(n => n.Order)
+        //        .ToList();
+
+        //    // Створюємо список для відображення (без дублікатів)
+        //    var displayList = new List<Navigate>();
+
+        //    // Додаємо всі елементи
+        //    foreach (var navigate in allNavigates)
+        //    {
+        //        // Додаємо поточний елемент
+        //        displayList.Add(navigate);
+
+        //        // Додаємо всіх нащадків
+        //        AddAllDescendants(navigate, displayList);
+        //    }
+
+        //    // Видаляємо дублікати (якщо є)
+        //    displayList = displayList.Distinct().OrderBy(n => n.Order).ToList();
+
+        //    // Зберігаємо всі навігації в ViewBag для пошуку батьків
+        //    ViewBag.AllNavigates = allNavigates;
+
+        //    return View(displayList);
+        //}
+
+        //// Допоміжний метод для додавання всіх нащадків
+        //private void AddAllDescendants(Navigate parent, List<Navigate> list)
+        //{
+        //    if (parent.Childs?.Any() == true)
+        //    {
+        //        foreach (var child in parent.Childs.OrderBy(c => c.Order))
+        //        {
+        //            list.Add(child);
+        //            AddAllDescendants(child, list);
+        //        }
+        //    }
+        //}
+
+        public IActionResult Navigation()
+        {
+            // 1. Отримуємо всі пункти меню
+            var allNavigates = _agencyDBContext.Navigates
+                .Include(n => n.Childs)
+                .ToList();
+
+            // 2. Створюємо відсортований список: спочатку батьки, потім діти
+            var displayList = new List<Navigate>();
+
+            // Спочатку всі батьки (відсортовані)
+            var parents = allNavigates
+                .Where(n => n.ParentID == null)
+                .OrderBy(n => n.Order)
+                .ThenBy(n => n.Id);
+
+            foreach (var parent in parents)
+            {
+                // Додаємо батька
+                displayList.Add(parent);
+
+                // Додаємо всіх його дітей (відсортованих)
+                var children = allNavigates
+                    .Where(n => n.ParentID == parent.Id)
+                    .OrderBy(n => n.Order)
+                    .ThenBy(n => n.Id);
+
+                displayList.AddRange(children);
+            }
+
+            // 3. Для тих, хто не має батька але не кореневий (на всяк випадок)
+            var orphans = allNavigates
+                .Where(n => n.ParentID != null && !allNavigates.Any(p => p.Id == n.ParentID))
+                .OrderBy(n => n.Order)
+                .ThenBy(n => n.Id);
+
+            displayList.AddRange(orphans);
+
+            // 4. Зберігаємо всі навігації в ViewBag
+            ViewBag.AllNavigates = allNavigates;
+
+            return View(displayList);
+        }
+
+
+
+
+
+
+        [HttpGet]
+        public IActionResult EditNavigation(int id)
+        {
+            var navigate = _agencyDBContext.Navigates
+                .Include(n => n.Childs)
+                .FirstOrDefault(n => n.Id == id);
+
+            if (navigate == null)
+            {
+                TempData["ErrorMessage"] = "Пункт меню не знайдено";
+                return RedirectToAction("Navigation");
+            }
+
+            // Отримуємо всі навігації для вибору батька
+            var allNavigates = _agencyDBContext.Navigates
+                .Where(n => n.Id != id) // Виключаємо поточний елемент
+                .ToList();
+
+            ViewBag.AllNavigates = allNavigates;
+            return View(navigate);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult UpdateNavigation(Navigate navigate)
+        {
+            try
+            {
+                var existingNavigate = _agencyDBContext.Navigates.Find(navigate.Id);
+
+                if (existingNavigate == null)
+                {
+                    TempData["ErrorMessage"] = "Пункт меню не знайдено";
+                    return RedirectToAction("Navigation");
+                }
+
+                // Оновлюємо поля
+                existingNavigate.Title = navigate.Title;
+                existingNavigate.Href = string.IsNullOrEmpty(navigate.Href) ? "#" : navigate.Href;
+                existingNavigate.Order = navigate.Order;
+                existingNavigate.ParentID = navigate.ParentID;
+
+                _agencyDBContext.SaveChanges();
+                TempData["SuccessMessage"] = "Пункт меню успішно оновлено!";
+
+                return RedirectToAction("Navigation");
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = "Помилка при оновленні пункту меню: " + ex.Message;
+                return RedirectToAction("EditNavigation", new { id = navigate.Id });
+            }
+        }
+
+
+
+
+
+        [HttpGet]
+        public IActionResult CreateNavigation()
+        {
+            var allNavigates = _agencyDBContext.Navigates.ToList();
+
+            // Автоматично заповнюємо наступний порядок
+            int nextOrder = _agencyDBContext.Navigates
+                .Where(n => n.ParentID == null) // для кореневих
+                .Max(n => (int?)n.Order) ?? 0;
+
+            ViewBag.NextOrder = nextOrder + 1;
+            ViewBag.AllNavigates = allNavigates;
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult CreateNavigation(Navigate navigate)
+        {
+            try
+            {
+                navigate.Href = string.IsNullOrEmpty(navigate.Href) ? "#" : navigate.Href;
+
+                // Якщо не вказано порядок або 0 - ставимо автоматично
+                if (navigate.Order <= 0)
+                {
+                    var maxOrder = _agencyDBContext.Navigates
+                        .Where(n => n.ParentID == navigate.ParentID)
+                        .Max(n => (int?)n.Order) ?? 0;
+
+                    navigate.Order = maxOrder + 1;
+                }
+                // Якщо вказаний порядок зайнятий - ЗСУВАЄМО
+                else if (_agencyDBContext.Navigates
+                    .Any(n => n.ParentID == navigate.ParentID && n.Order == navigate.Order))
+                {
+                    // Зсуваємо всі після цього порядку
+                    var itemsToShift = _agencyDBContext.Navigates
+                        .Where(n => n.ParentID == navigate.ParentID && n.Order >= navigate.Order)
+                        .OrderByDescending(n => n.Order)
+                        .ToList();
+
+                    foreach (var item in itemsToShift)
+                    {
+                        item.Order++;
+                    }
+                }
+
+                _agencyDBContext.Navigates.Add(navigate);
+                _agencyDBContext.SaveChanges();
+
+                TempData["SuccessMessage"] = $"Пункт '{navigate.Title}' створено (порядок: {navigate.Order})!";
+                return RedirectToAction("Navigation");
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = "Помилка: " + ex.Message;
+                var allNavigates = _agencyDBContext.Navigates.ToList();
+                ViewBag.AllNavigates = allNavigates;
+                return View(navigate);
+            }
+        }
+
+
+
+        [HttpGet]
+        public IActionResult DeleteNavigation(int id)
+        {
+            try
+            {
+                // Знаходимо пункт з усіма дочірніми елементами
+                var navigate = _agencyDBContext.Navigates
+                    .Include(n => n.Childs)
+                    .FirstOrDefault(n => n.Id == id);
+
+                if (navigate == null)
+                {
+                    return Json(new { success = false, message = "Пункт меню не знайдено" });
+                }
+
+                string title = navigate.Title;
+                int childrenCount = navigate.Childs?.Count ?? 0;
+
+                // Рекурсивно видаляємо всіх нащадків
+                DeleteNavigationRecursive(navigate);
+
+                // Видаляємо сам пункт
+                _agencyDBContext.Navigates.Remove(navigate);
+                _agencyDBContext.SaveChanges();
+
+                return Json(new
+                {
+                    success = true,
+                    message = $"Пункт '{title}' успішно видалено" +
+                              (childrenCount > 0 ? $" (разом з {childrenCount} дочірніми)" : "")
+                });
+            }
+            catch (Exception ex)
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = "Помилка при видаленні: " + ex.Message
+                });
+            }
+        }
+
+        // Рекурсивний метод для видалення всіх нащадків
+        private void DeleteNavigationRecursive(Navigate parent)
+        {
+            if (parent.Childs?.Any() == true)
+            {
+                var children = parent.Childs.ToList();
+                foreach (var child in children)
+                {
+                    DeleteNavigationRecursive(child);
+                    _agencyDBContext.Navigates.Remove(child);
+                }
+            }
+        }
+
+        //[HttpPost]
+        //[ValidateAntiForgeryToken]
+        //public IActionResult DeleteNavigation(int navigationId)
+        //{
+        //    try
+        //    {
+        //        // Знаходимо пункт з усіма дочірніми елементами
+        //        var navigate = _agencyDBContext.Navigates
+        //            .Include(n => n.Childs)
+        //            .FirstOrDefault(n => n.Id == navigationId);
+
+        //        if (navigate == null)
+        //        {
+        //            return Json(new { success = false, message = "Пункт меню не знайдено" });
+        //        }
+
+        //        // Рекурсивно видаляємо всіх нащадків
+        //        DeleteNavigationRecursive(navigate);
+
+        //        // Видаляємо сам пункт
+        //        _agencyDBContext.Navigates.Remove(navigate);
+        //        _agencyDBContext.SaveChanges();
+
+        //        return Json(new
+        //        {
+        //            success = true,
+        //            message = $"Пункт '{navigate.Title}' успішно видалено"
+        //        });
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return Json(new
+        //        {
+        //            success = false,
+        //            message = "Помилка при видаленні: " + ex.Message
+        //        });
+        //    }
+        //}
+
+        // Рекурсивний метод для видалення всіх нащадків
+        //private void DeleteNavigationRecursive(Navigate parent)
+        //{
+        //    if (parent.Childs?.Any() == true)
+        //    {
+        //        foreach (var child in parent.Childs.ToList()) // ToList() щоб уникнути змін під час ітерації
+        //        {
+        //            DeleteNavigationRecursive(child);
+        //            _agencyDBContext.Navigates.Remove(child);
+        //        }
+        //    }
+        //}
+
     }
 }

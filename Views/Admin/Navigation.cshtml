@@ -1,0 +1,303 @@
+﻿@model IEnumerable<WebApp.Entities.Navigate>
+@{
+    ViewData["Title"] = "Управління меню";
+    ViewData["ActivePage"] = "Navigation";
+
+    // Отримуємо всі навігації для відображення батьківських назв
+    var allNavigates = ViewBag.AllNavigates as List<WebApp.Entities.Navigate> ?? new List<WebApp.Entities.Navigate>();
+}
+
+<!-- Container -->
+<div class="container-fixed" id="content_container">
+</div>
+<!-- End of Container -->
+<!-- Container -->
+<div class="container-fixed">
+    <div class="flex flex-wrap items-center lg:items-end justify-between gap-5 pb-7.5">
+        <div class="flex flex-col justify-center gap-2">
+            <h1 class="text-xl font-medium leading-none text-gray-900">
+                Управління меню
+            </h1>
+            <div class="flex items-center gap-2 text-sm font-normal text-gray-700">
+                Створюйте та редагуйте навігаційне меню
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End of Container -->
+<!-- Container -->
+<div class="container-fixed">
+    <div class="grid gap-5 lg:gap-7.5">
+        <div class="card card-grid min-w-full">
+            <div class="card-header flex-wrap gap-2">
+                <h3 class="card-title font-medium text-sm">
+                    Показ @Model.Count() пунктів меню
+                </h3>
+                <div class="flex flex-wrap gap-2 lg:gap-5">
+                    <div class="flex">
+                        <label class="input input-sm">
+                            <i class="ki-filled ki-magnifier"></i>
+                            <input data-datatable-search="#navigation_table" placeholder="Пошук пунктів меню" type="text" value="">
+                        </label>
+                    </div>
+                    <div class="flex flex-wrap gap-2.5">
+                       
+                        <button class="btn btn-sm btn-success" onclick="window.location.href='/Admin/CreateNavigation'">
+                            <i class="ki-filled ki-plus-squared"></i>
+                            Додати пункт
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-body">
+                @if (TempData["SuccessMessage"] != null)
+                {
+                    <div class="alert alert-success alert-dismissible fade show mb-4" role="alert">
+                        <i class="ki-filled ki-check-circle me-2"></i>
+                        @TempData["SuccessMessage"]
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                }
+
+                @if (TempData["ErrorMessage"] != null)
+                {
+                    <div class="alert alert-danger alert-dismissible fade show mb-4" role="alert">
+                        <i class="ki-filled ki-cross-circle me-2"></i>
+                        @TempData["ErrorMessage"]
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                }
+
+                @if (!Model.Any())
+                {
+                    <div class="alert alert-info">
+                        <i class="ki-filled ki-information fs-2 me-2"></i>
+                        Меню поки що немає. <a href="/Admin/CreateNavigation" class="alert-link">Створіть перший пункт</a>.
+                    </div>
+                }
+                else
+                {
+                    <div data-datatable="true" data-datatable-state-save="false" id="navigation_table">
+                        <div class="scrollable-x-auto">
+                            <table class="table table-auto table-border" data-datatable-table="true">
+                                <thead>
+                                    <tr>
+                                        <th class="w-[60px] text-center">
+                                            Id
+                                        </th>
+                                        <th class="min-w-[200px]">
+                                            <span class="sort asc">
+                                                <span class="sort-label font-normal text-gray-700">
+                                                    Назва
+                                                </span>
+                                                <span class="sort-icon"></span>
+                                            </span>
+                                        </th>
+                                        <th class="min-w-[200px]">
+                                            <span class="sort">
+                                                <span class="sort-label font-normal text-gray-700">
+                                                    URL
+                                                </span>
+                                                <span class="sort-icon"></span>
+                                            </span>
+                                        </th>
+                                        <th class="min-w-[150px]">
+                                            <span class="sort">
+                                                <span class="sort-label font-normal text-gray-700">
+                                                    Порядок
+                                                </span>
+                                                <span class="sort-icon"></span>
+                                            </span>
+                                        </th>
+                                        <th class="min-w-[180px]">
+                                            <span class="sort">
+                                                <span class="sort-label font-normal text-gray-700">
+                                                    Батьківський пункт
+                                                </span>
+                                                <span class="sort-icon"></span>
+                                            </span>
+                                        </th>
+                                        <th class="min-w-[90px]">
+                                            <span class="sort">
+                                                <span class="sort-label font-normal text-gray-700">
+                                                    Дочірні
+                                                </span>
+                                                <span class="sort-icon"></span>
+                                            </span>
+                                        </th>
+                                        <th class="min-w-[180px]">
+                                            <span class="sort">
+                                                <span class="sort-label font-normal text-gray-700">
+                                                    Дії
+                                                </span>
+                                                <span class="sort-icon"></span>
+                                            </span>
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var menu in Model)
+                                    {
+                                        <tr data-level="@(menu.ParentID == null ? "root" : "child")">
+                                            <td class="text-center">
+                                                <span class="badge badge-light">@menu.Id</span>
+                                            </td>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    @if (menu.ParentID != null)
+                                                    {
+                                                        <span class="text-muted me-2">↳</span>
+                                                    }
+                                                    <span class="font-medium">@menu.Title</span>
+                                                </div>
+                                            </td>
+                                            <td class="text-gray-800 font-normal">
+                                                <code class="text-sm">@menu.Href</code>
+                                            </td>
+                                            <td class="text-center">
+                                                <span class="badge badge-primary badge-circle">@menu.Order</span>
+                                            </td>
+                                            <td class="text-gray-800 font-normal">
+                                                @if (menu.ParentID.HasValue)
+                                                {
+                                                    var parent = allNavigates.FirstOrDefault(p => p.Id == menu.ParentID.Value);
+                                                    if (parent != null)
+                                                    {
+                                                        <span class="text-muted">@parent.Title</span>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="text-muted fst-italic">—</span>
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge badge-success badge-outline">Корінь</span>
+                                                }
+                                            </td>
+                                            <td class="text-center">
+                                                @if (menu.Childs?.Any() == true)
+                                                {
+                                                    <span class="badge badge-info badge-circle">@menu.Childs.Count</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="text-muted">—</span>
+                                                }
+                                            </td>
+                                            <td class="text-center">
+                                                <div class="menu flex-inline" data-menu="true">
+                                                    <div class="menu-item" data-menu-item-offset="0, 10px" data-menu-item-placement="bottom-end" data-menu-item-placement-rtl="bottom-start" data-menu-item-toggle="dropdown" data-menu-item-trigger="click|lg:click">
+                                                        <button class="menu-toggle btn btn-sm btn-icon btn-light btn-clear">
+                                                            <i class="ki-filled ki-dots-vertical"></i>
+                                                        </button>
+                                                        <div class="menu-dropdown menu-default w-full max-w-[175px]" data-menu-dismiss="true">
+                                                            <div class="menu-item">
+                                                                <a class="menu-link" href="/Admin/EditNavigation/@menu.Id">
+                                                                    <span class="menu-icon">
+                                                                        <i class="ki-filled ki-pencil"></i>
+                                                                    </span>
+                                                                    <span class="menu-title">
+                                                                        Редагувати
+                                                                    </span>
+                                                                </a>
+                                                            </div>
+                                                            <div class="menu-item">
+                                                                <a class="menu-link remove_navigation_button"
+                                                                   href="#"
+                                                                   data-navigation-id="@menu.Id"
+                                                                   data-navigation-title="@menu.Title.Replace("'", "&apos;")"
+                                                                   data-children-count="@(menu.Childs?.Count ?? 0)">
+                                                                    <span class="menu-icon">
+                                                                        <i class="ki-filled ki-trash"></i>
+                                                                    </span>
+                                                                    <span class="menu-title">Видалити</span>
+                                                                </a>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="card-footer justify-center md:justify-between flex-col md:flex-row gap-5 text-gray-600 text-2sm font-medium">
+                            <div class="flex items-center gap-2 order-2 md:order-1">
+                                Показати
+                                <select class="select select-sm w-16" data-datatable-size="true" name="perpage">
+                                    <option value="10">10</option>
+                                    <option value="25">25</option>
+                                    <option value="50">50</option>
+                                    <option value="100">100</option>
+                                </select>
+                                на сторінці
+                            </div>
+                            <div class="flex items-center gap-4 order-1 md:order-2">
+                                <span data-datatable-info="true"></span>
+                                <div class="pagination" data-datatable-pagination="true"></div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Modal Remove Navigation -->
+<div class="modal" data-modal="true" id="remove_navigation_modal" style="background-color: dimgray">
+    <div class="modal-content max-w-[600px] top-[15%]">
+        <div class="modal-header py-4 px-5 justify-end">
+            <button class="btn btn-sm btn-icon btn-light btn-clear shrink-0" data-modal-dismiss="true">
+                <i class="ki-filled ki-cross"></i>
+            </button>
+        </div>
+        <div class="modal-body p-0 pb-5" style="background-color: black">
+            <div class="scrollable-y-auto" data-scrollable="true" data-scrollable-max-height="auto" data-scrollable-offset="300px">
+                <div id="remove_navigation_modal_content">
+                    <div class="menu menu-default p-0 flex-col">
+                        <div class="menu-item">
+                            <div class="menu-link flex items-center justify-between gap-2">
+                                <div class="flex items-center grow gap-2 justify-center">
+                                    <div class="flex flex-col gap-0.5">
+                                        <span class="text-2sm font-semibold text-gray-900">
+                                            Ви дійсно хочете видалити пункт меню?
+                                        </span>
+                                        <div class="text-sm text-gray-700 mt-2">
+                                            Назва: <span id="navigation_name_display" class="font-medium"></span>
+                                        </div>
+                                        <div class="text-xs text-gray-500 mt-1">
+                                            ID: <span id="navigation_id_display"></span>
+                                        </div>
+                                        <div class="text-xs text-gray-500" id="children_count_display">
+                                            <!-- Тут буде інформація про дочірні елементи -->
+                                        </div>
+                                        <small class="text-red-500 text-xs mt-2" id="warning_message">
+                                            ⚠️ Увага! Ця дія є незворотною.
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex flex-wrap gap-2.5 px-4 pt-2 justify-center">
+                            <button class="btn btn-sm btn-success remove_navigation_form_button_cancel">
+                                Закрити
+                            </button>
+                            <button class="btn btn-sm btn-danger remove_navigation_form_button_confirm">
+                                Видалити
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<script src="~/assets/js/removeNavigation.js"></script>

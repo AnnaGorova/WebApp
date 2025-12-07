@@ -1,0 +1,88 @@
+﻿@model WebApp.Entities.Navigate
+@{
+    ViewData["Title"] = "Створення нового пункту меню";
+    var allNavigates = ViewBag.AllNavigates as List<WebApp.Entities.Navigate> ?? new List<WebApp.Entities.Navigate>();
+}
+
+<!-- Container -->
+<div class="container-fixed">
+    <div class="flex flex-wrap items-center lg:items-end justify-between gap-5 pb-7.5">
+        <div class="flex flex-col justify-center gap-2">
+            <h1 class="text-xl font-medium leading-none text-gray-900">
+                Створення нового пункту меню
+            </h1>
+            <div class="flex items-center gap-2 text-sm font-normal text-gray-700">
+                Додавання нового пункту в навігаційне меню
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Container -->
+<div class="container-fixed">
+    <form class="card" asp-controller="Admin" asp-action="CreateNavigation"
+          method="post" enctype="multipart/form-data">
+        @Html.AntiForgeryToken()
+
+        <div class="card-header">
+            <h3 class="card-title">
+                Новий пункт меню
+            </h3>
+        </div>
+
+        <div class="card-body grid gap-5">
+            @if (TempData["SuccessMessage"] != null)
+            {
+                <div class="alert alert-success mb-4">
+                    @TempData["SuccessMessage"]
+                </div>
+            }
+
+            @if (TempData["ErrorMessage"] != null)
+            {
+                <div class="alert alert-danger mb-4">
+                    @TempData["ErrorMessage"]
+                </div>
+            }
+
+            <!-- Title -->
+            <div class="flex items-baseline flex-wrap lg:flex-nowrap gap-2.5">
+                <label class="form-label max-w-32">Назва *</label>
+                <input class="input" name="Title" type="text" required />
+            </div>
+
+            <!-- Href -->
+            <div class="flex items-baseline flex-wrap lg:flex-nowrap gap-2.5">
+                <label class="form-label max-w-32">URL *</label>
+                <input class="input" name="Href" type="text" required />
+            </div>
+
+            <!-- Order -->
+            <div class="flex items-baseline flex-wrap lg:flex-nowrap gap-2.5">
+                <label class="form-label max-w-32">Порядок *</label>
+                <input class="input" name="Order" type="number" value="@(ViewBag.NextOrder ?? 1)" required />
+            </div>
+
+            <!-- ParentID -->
+            <div class="flex items-baseline flex-wrap lg:flex-nowrap gap-2.5">
+                <label class="form-label max-w-32">Батьківський пункт</label>
+                <select class="select" name="ParentID">
+                    <option value="">Без батьківського пункту</option>
+                    @foreach (var nav in allNavigates)
+                    {
+                        <option value="@nav.Id">@nav.Title</option>
+                    }
+                </select>
+            </div>
+        </div>
+
+        <div class="card-footer justify-center">
+            <button class="btn btn-sm btn-primary" type="submit">
+                Створити пункт
+            </button>
+            <a class="btn btn-sm btn-light" href="/Admin/Navigation">
+                Скасувати
+            </a>
+        </div>
+    </form>
+</div>
