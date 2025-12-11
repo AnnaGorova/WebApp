@@ -239,15 +239,15 @@ namespace WebApp.Db
 
 
 
-                var demoNavigate = new Navigate
-                {
-                    Title = "Multi Level",
-                    Href = "#",
-                    Order = 6,
-                    ParentID = pagesNavigate.Id
-                };
-                context.Navigates.Add(demoNavigate);
-                context.SaveChanges();
+                //var demoNavigate = new Navigate
+                //{
+                //    Title = "Multi Level",
+                //    Href = "#",
+                //    Order = 6,
+                //    ParentID = pagesNavigate.Id
+                //};
+                //context.Navigates.Add(demoNavigate);
+                //context.SaveChanges();
 
                 // Створюємо структуру:
                 // Multi Level
@@ -255,29 +255,29 @@ namespace WebApp.Db
                 //     → Level 1.1
                 //       → Level 1.1.1
                 //   → Level 2
-                var level1 = new Navigate { Title = "Level 1", Href = "#", Order = 1, ParentID = demoNavigate.Id };
-                context.Navigates.Add(level1);
-                context.SaveChanges();
+                //var level1 = new Navigate { Title = "Level 1", Href = "#", Order = 1, ParentID = demoNavigate.Id };
+                //context.Navigates.Add(level1);
+                //context.SaveChanges();
 
-                var level1_1 = new Navigate { Title = "Level 1.1", Href = "#", Order = 1, ParentID = level1.Id };
-                context.Navigates.Add(level1_1);
-                context.SaveChanges();
+                //var level1_1 = new Navigate { Title = "Level 1.1", Href = "#", Order = 1, ParentID = level1.Id };
+                //context.Navigates.Add(level1_1);
+                //context.SaveChanges();
 
-                var level1_1_1 = new Navigate { Title = "Level 1.1.1", Href = "/deep/final", Order = 1, ParentID = level1_1.Id };
-                context.Navigates.Add(level1_1_1);
-                context.SaveChanges();
+                //var level1_1_1 = new Navigate { Title = "Level 1.1.1", Href = "/deep/final", Order = 1, ParentID = level1_1.Id };
+                //context.Navigates.Add(level1_1_1);
+                //context.SaveChanges();
 
-                var level1_1_1_1 = new Navigate { Title = "Level 1.1.1.1", Href = "/deep/final/final1", Order = 1, ParentID = level1_1_1.Id };
-                context.Navigates.Add(level1_1_1_1);
-                context.SaveChanges();
+                //var level1_1_1_1 = new Navigate { Title = "Level 1.1.1.1", Href = "/deep/final/final1", Order = 1, ParentID = level1_1_1.Id };
+                //context.Navigates.Add(level1_1_1_1);
+                //context.SaveChanges();
 
-                var level2 = new Navigate { Title = "Level 2", Href = "#", Order = 2, ParentID = demoNavigate.Id };
-                context.Navigates.Add(level2);
-                context.SaveChanges();
+                //var level2 = new Navigate { Title = "Level 2", Href = "#", Order = 2, ParentID = demoNavigate.Id };
+                //context.Navigates.Add(level2);
+                //context.SaveChanges();
 
-                var level2_2 = new Navigate { Title = "Level 2.2", Href = "/deep/level2.2", Order = 2, ParentID = level2.Id };
-                context.Navigates.Add(level2_2);
-                context.SaveChanges();
+                //var level2_2 = new Navigate { Title = "Level 2.2", Href = "/deep/level2.2", Order = 2, ParentID = level2.Id };
+                //context.Navigates.Add(level2_2);
+                //context.SaveChanges();
 
 
 

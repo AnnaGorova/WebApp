@@ -1,0 +1,75 @@
+﻿@{
+    ViewData["Title"] = "Підтвердження реєстрації";
+    Layout = "_AccountLayout";
+}
+
+<div class="card">
+    <div class="card-body flex flex-col gap-5 p-10">
+        <div class="text-center mb-2.5">
+            <h3 class="text-lg font-medium text-gray-900 leading-none mb-2.5">
+                Підтвердіть номер телефону
+            </h3>
+            @if (TempData["PendingPhoneNumber"] != null)
+            {
+                <p class="text-sm text-gray-600">
+                    Код відправлено на телефон @TempData["PendingPhoneNumber"]
+                </p>
+
+                @if (TempData["PendingEmail"] != null)
+                {
+                    <p class="text-sm text-gray-500 mt-1">
+                        Email: @TempData["PendingEmail"]
+                    </p>
+                }
+
+                <div class="bg-yellow-100 border border-yellow-300 p-3 rounded mt-2">
+                    <p class="text-sm text-yellow-800">
+                        <strong>Для тесту:</strong> Перевірте консоль логів для отримання реального коду
+                    </p>
+                    <a href="/Account/DebugPhoneCache?phoneNumber=@TempData["PendingPhoneNumber"]"
+                       target="_blank"
+                       class="text-blue-600 hover:underline text-sm">
+                        Перевірити кеш
+                    </a>
+                </div>
+            }
+        </div>
+
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <div class="bg-red-600 text-white p-3 rounded-lg mb-4 border border-red-700">
+                <p class="m-0 font-medium">@TempData["ErrorMessage"]</p>
+            </div>
+        }
+
+        <form asp-action="VerifyPhoneRegistration" method="post">
+            <input type="hidden" name="phoneNumber" value="@TempData["PendingPhoneNumber"]" />
+
+            <div class="flex flex-col gap-1 mb-4">
+                <label class="form-label font-normal text-gray-900">
+                    6-значний код підтвердження
+                </label>
+                <input class="input text-center text-xl tracking-widest"
+                       name="code"
+                       value=""
+                       placeholder="000000"
+                       type="text"
+                       maxlength="6"
+                       required />
+                <small class="text-xs text-gray-500 mt-1">
+                    Введіть 6-значний код з SMS для завершення реєстрації
+                </small>
+            </div>
+
+            <button type="submit" class="btn btn-primary flex justify-center w-full mb-2">
+                Підтвердити та завершити реєстрацію
+            </button>
+
+            <div class="text-center">
+                <a class="text-sm link" href="/Account/RegisterWithPhone?phone=@TempData["PendingPhoneNumber"]">
+                    Повернутись до форми реєстрації
+                </a>
+            </div>
+        </form>
+    </div>
+</div>

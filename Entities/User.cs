@@ -75,6 +75,44 @@ namespace WebApp.Entities
 
 
 
-        public string? GoogleId { get; set; } // Додайте це поле для Google авторизаці
+        public string? GoogleId { get; set; } //  поле для Google авторизаці
+
+
+
+
+
+
+        /// <summary>
+        /// Номер телефону користувача
+        /// </summary>
+        [Phone(ErrorMessage = "Невірний формат телефону")]
+        [StringLength(20, ErrorMessage = "Телефон не може перевищувати 20 символів")]
+        [Column("PhoneNumber")]
+        [Display(Name = "Номер телефону")]
+        public string? PhoneNumber { get; set; }
+
+        /// <summary>
+        /// Чи підтверджено номер телефону
+        /// </summary>
+        [Column("PhoneNumberConfirmed")]
+        [Display(Name = "Телефон підтверджено")]
+        public bool PhoneNumberConfirmed { get; set; } = false;
+
+
+
+        /// <summary>
+        /// Перевіряє тип авторизації користувача
+        /// </summary>
+        public AuthType GetAuthType()
+        {
+            if (!string.IsNullOrEmpty(GoogleId))
+                return AuthType.Google;
+
+            if (!string.IsNullOrEmpty(PhoneNumber) && PhoneNumberConfirmed)
+                return AuthType.Phone;
+
+            return AuthType.EmailPassword;
+        }
+
     }
 }

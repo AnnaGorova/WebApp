@@ -1,0 +1,50 @@
+﻿<!-- Views/Account/Profile.cshtml -->
+@{
+    ViewData["Title"] = "Профіль користувача";
+    Layout = "_AccountLayout";
+}
+
+<div class="card">
+    <div class="card-body flex flex-col gap-5 p-10">
+        <h2 class="text-xl font-bold">Профіль користувача</h2>
+
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="bg-green-100 border border-green-300 text-green-800 p-3 rounded mb-4">
+                @TempData["SuccessMessage"]
+            </div>
+        }
+
+        <div class="space-y-3">
+            <div>
+                <strong>Email:</strong> @Model.Email
+            </div>
+            <div>
+                <strong>Логін:</strong> @Model.Login
+            </div>
+            <div>
+                <strong>Телефон:</strong>
+                @if (!string.IsNullOrEmpty(Model.PhoneNumber))
+                {
+                    <span>@Model.PhoneNumber</span>
+                    @if (Model.PhoneNumberConfirmed)
+                    {
+                        <span class="text-green-600">✓ Підтверджено</span>
+                    }
+                    else
+                    {
+                        <span class="text-yellow-600">(Не підтверджено)</span>
+                    }
+                }
+                else
+                {
+                    <span class="text-gray-500">Не вказано</span>
+                }
+            </div>
+        </div>
+
+        <a asp-controller="Home" asp-action="Index" class="btn btn-primary mt-4">
+            На головну
+        </a>
+    </div>
+</div>

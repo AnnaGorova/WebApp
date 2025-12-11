@@ -1,0 +1,34 @@
+﻿@{
+    ViewData["Title"] = "Телефон успішно прив'язано";
+    Layout = "_AccountLayout";
+}
+
+<div class="card">
+    <div class="card-body text-center p-10">
+        <div class="mb-4">
+            <i class="bi bi-check-circle text-success" style="font-size: 4rem;"></i>
+        </div>
+
+        <h2 class="text-2xl font-bold mb-2">Успішно!</h2>
+
+        <p class="text-gray-600 mb-4">
+            Телефон <strong>@TempData["LinkedPhone"]</strong> прив'язано до акаунта
+            <strong>@TempData["LinkedEmail"]</strong>
+        </p>
+
+        <div class="alert alert-success mb-4">
+            <i class="bi bi-info-circle me-2"></i>
+            Тепер ви можете входити через номер телефону
+        </div>
+
+        <div class="flex flex-col gap-3">
+            <a href="/" class="btn btn-primary">
+                <i class="bi bi-house me-2"></i> Перейти на головну
+            </a>
+
+            <a href="/Account/Profile" class="btn btn-outline-primary">
+                <i class="bi bi-person-circle me-2"></i> Перейти в профіль
+            </a>
+        </div>
+    </div>
+</div>

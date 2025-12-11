@@ -13,8 +13,8 @@
  </div>*@
 
 
-<form class="card-body flex flex-col gap-5 p-10" id="sign_in_form" 
-    method="post" asp-controller="Account" asp-action="CheckUser" >
+<form class="card-body flex flex-col gap-5 p-10" id="sign_in_form"
+      method="post" asp-controller="Account" asp-action="LoginIn">
     <div class="text-center mb-2.5">
         @Html.AntiForgeryToken()
         <h3 class="text-lg font-medium text-gray-900 leading-none mb-2.5">
@@ -40,10 +40,11 @@
             <img alt="" class="size-3.5 shrink-0" src="~/assets/media/brand-logos/google.svg" />
             Use Google
         </a>
-        <a class="btn btn-light btn-sm justify-center" href="#">
-            <img alt="" class="size-3.5 shrink-0 dark:hidden" src="~/assets/media/brand-logos/apple-black.svg" />
-            <img alt="" class="size-3.5 shrink-0 light:hidden" src="~/assets/media/brand-logos/apple-white.svg" />
-            Use Apple
+        <a class="btn btn-light btn-sm justify-center"
+           asp-controller="Account"
+           asp-action="LoginWithPhone">
+            <i class="bi bi-phone me-2"></i>
+            Use Phone
         </a>
     </div>
     <div class="flex items-center gap-2">

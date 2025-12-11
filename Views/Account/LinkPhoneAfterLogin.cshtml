@@ -1,0 +1,71 @@
+﻿@{
+    ViewData["Title"] = "Прив'язати телефон";
+    Layout = "_AccountLayout";
+}
+
+<div class="card">
+    <div class="card-body flex flex-col gap-5 p-10">
+        <h3 class="text-lg font-medium text-gray-900 leading-none mb-2.5">
+            Прив'язати телефон до акаунта
+        </h3>
+
+        <!-- Інформація -->
+        <div class="bg-blue-50 border border-blue-200 p-4 rounded mb-4">
+            <div class="flex items-start">
+                <i class="bi bi-info-circle text-blue-500 mt-0.5 mr-3"></i>
+                <div>
+                    <p class="font-medium text-blue-800 mb-1">
+                        Знайдено існуючий акаунт
+                    </p>
+                    <p class="text-blue-700 text-sm mb-2">
+                        Email <strong>@ViewBag.LinkPhoneEmail</strong> вже зареєстровано.
+                    </p>
+                    <p class="text-blue-700 text-sm">
+                        Ви можете прив'язати телефон <strong>@ViewBag.LinkPhonePhone</strong>
+                        до цього акаунта.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Варіанти -->
+        <div class="space-y-3">
+            <div class="border border-gray-200 rounded p-4">
+                <h4 class="font-medium text-gray-900 mb-2">
+                    <i class="bi bi-check-circle text-green-500 mr-2"></i>
+                    Варіант 1: Увійти та прив'язати телефон
+                </h4>
+                <p class="text-gray-600 text-sm mb-3">
+                    Якщо це ваш акаунт - увійдіть і телефон буде автоматично прив'язано.
+                </p>
+                <a asp-controller="Account" asp-action="LoginIn"
+                   class="btn btn-primary w-full">
+                    <i class="bi bi-box-arrow-in-right mr-2"></i> Увійти в акаунт
+                </a>
+            </div>
+
+            <div class="border border-gray-200 rounded p-4">
+                <h4 class="font-medium text-gray-900 mb-2">
+                    <i class="bi bi-person-plus text-blue-500 mr-2"></i>
+                    Варіант 2: Створити новий акаунт
+                </h4>
+                <p class="text-gray-600 text-sm mb-3">
+                    Якщо ви хочете створити новий акаунт з цим телефоном.
+                </p>
+                <a asp-controller="Account" asp-action="RegisterWithPhone"
+                   asp-route-phone="@ViewBag.LinkPhonePhone"
+                   class="btn btn-outline-primary w-full">
+                    <i class="bi bi-phone mr-2"></i> Реєстрація з іншим email
+                </a>
+            </div>
+        </div>
+
+        <!-- Додаткова інформація -->
+        <div class="text-sm text-gray-500 mt-4">
+            <p>
+                <i class="bi bi-shield-check mr-1"></i>
+                Після прив'язування телефону ви зможете входити через SMS-код.
+            </p>
+        </div>
+    </div>
+</div>

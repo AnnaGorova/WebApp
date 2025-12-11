@@ -1,0 +1,135 @@
+﻿@{
+    ViewData["Title"] = "Демо SMS-авторизації";
+    Layout = "_AccountLayout";
+}
+
+<div class="card">
+    <div class="card-body">
+        <h3 class="card-title">📱 Демонстрація SMS-авторизації</h3>
+
+        <div class="alert alert-info mb-3">
+            <h5><i class="bi bi-info-circle"></i> Демо-режим</h5>
+            <p class="mb-0">SMS не відправляються реально. У продакшн-версії підключається Twilio/Vonage API.</p>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="mb-3">
+                    <label class="form-label">Номер телефону:</label>
+                    <input type="tel" id="phoneInput" class="form-control"
+                           value="+380667160527" placeholder="+380XXXXXXXXX">
+                </div>
+
+                <button class="btn btn-primary w-100 mb-3" onclick="sendVerificationCode()">
+                    <i class="bi bi-send"></i> Надіслати код підтвердження
+                </button>
+
+                <div class="mb-3">
+                    <label class="form-label">Введіть отриманий код:</label>
+                    <input type="text" id="codeInput" class="form-control"
+                           placeholder="123456" maxlength="6">
+                </div>
+
+                <button class="btn btn-success w-100" onclick="verifyCode()">
+                    <i class="bi bi-check-circle"></i> Підтвердити код
+                </button>
+            </div>
+
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header bg-light">
+                        <i class="bi bi-chat-text"></i> Лог SMS
+                    </div>
+                    <div class="card-body">
+                        <div id="result" class="mb-3"></div>
+                        <div id="smsLog" class="small text-muted"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Надіслати код
+        async function sendVerificationCode() {
+            const phone = document.getElementById('phoneInput').value;
+            const resultDiv = document.getElementById('result');
+
+            resultDiv.innerHTML = '<div class="alert alert-warning">Відправляємо код...</div>';
+
+            try {
+                const response = await fetch(`/Account/send-verification-code?phone=${encodeURIComponent(phone)}`);
+                const data = await response.json();
+
+                if (data.success) {
+                    resultDiv.innerHTML = `
+                        <div class="alert alert-success">
+                            <h6><i class="bi bi-check-circle"></i> Код відправлено!</h6>
+                            <p class="mb-1">На номер: <strong>${data.phone}</strong></p>
+                            <p class="mb-1">Код: <strong>${data.code}</strong></p>
+                            <p class="mb-0"><small>${data.note || ''}</small></p>
+                        </div>
+                    `;
+                    document.getElementById('codeInput').value = data.code;
+                } else {
+                    resultDiv.innerHTML = `<div class="alert alert-danger">Помилка: ${data.error || 'Невідома помилка'}</div>`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="alert alert-danger">Помилка: ${error.message}</div>`;
+            }
+
+            loadSmsLog();
+        }
+
+        // Перевірити код
+        async function verifyCode() {
+            const phone = document.getElementById('phoneInput').value;
+            const code = document.getElementById('codeInput').value;
+            const resultDiv = document.getElementById('result');
+
+            if (!code || code.length !== 6) {
+                resultDiv.innerHTML = '<div class="alert alert-danger">Введіть 6-значний код</div>';
+                return;
+            }
+
+            try {
+                const response = await fetch(`/Account/verify-code?phone=${encodeURIComponent(phone)}&code=${code}`);
+                const data = await response.json();
+
+                if (data.valid) {
+                    resultDiv.innerHTML = `
+                        <div class="alert alert-success">
+                            <h6><i class="bi bi-shield-check"></i> Код вірний!</h6>
+                            <p class="mb-0">Авторизація успішна. Перенаправлення...</p>
+                        </div>
+                    `;
+
+                    // Імітуємо вхід через 2 секунди
+                    setTimeout(() => {
+                        window.location.href = '/';
+                    }, 2000);
+                } else {
+                    resultDiv.innerHTML = `<div class="alert alert-danger">Невірний код. Спробуйте ще раз.</div>`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="alert alert-danger">Помилка: ${error.message}</div>`;
+            }
+        }
+
+        // Завантажити лог SMS
+        async function loadSmsLog() {
+            try {
+                const response = await fetch('/Account/get-sms-log');
+                const data = await response.text();
+                document.getElementById('smsLog').innerHTML = data.replace(/\n/g, '<br>');
+            } catch (error) {
+                document.getElementById('smsLog').innerHTML = 'Не вдалося завантажити лог';
+            }
+        }
+
+        // Завантажити лог при завантаженні сторінки
+        document.addEventListener('DOMContentLoaded', loadSmsLog);
+    </script>
+}

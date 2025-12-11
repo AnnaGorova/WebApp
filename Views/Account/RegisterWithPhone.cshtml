@@ -1,0 +1,108 @@
+﻿@{
+    ViewData["Title"] = "Реєстрація через телефон";
+    Layout = "_AccountLayout";
+}
+
+<div class="card">
+    <div class="card-body flex flex-col gap-5 p-10">
+        <div class="text-center mb-2.5">
+            <h3 class="text-lg font-medium text-gray-900 leading-none mb-2.5">
+                Реєстрація через телефон
+            </h3>
+            <div class="flex items-center justify-center font-medium">
+                <span class="text-2sm text-gray-700 me-1.5">
+                    Вже маєте акаунт?
+                </span>
+                <a class="text-2sm link" href="/Account/loginIn">
+                    Увійти
+                </a>
+            </div>
+        </div>
+
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <div class="bg-red-600 text-white p-3 rounded-lg mb-4 border border-red-700">
+                <p class="m-0 font-medium">@TempData["ErrorMessage"]</p>
+            </div>
+        }
+
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="bg-green-600 text-white p-3 rounded-lg mb-4 border border-green-700">
+                <p class="m-0 font-medium">@TempData["SuccessMessage"]</p>
+            </div>
+        }
+
+        <form asp-action="RegisterWithPhone" method="post">
+            <div class="flex flex-col gap-1 mb-4">
+                <label class="form-label font-normal text-gray-900">
+                    Номер телефону
+                </label>
+                <input class="input"
+                       name="phoneNumber"
+                       placeholder="+380501234567"
+                       type="tel"
+                       value="@ViewBag.PhoneNumber"
+                       required />
+                <small class="text-xs text-gray-500 mt-1">
+                    Формат: +380501234567
+                </small>
+            </div>
+
+            <div class="flex flex-col gap-1 mb-4">
+                <label class="form-label font-normal text-gray-900">
+                    Email
+                </label>
+                <input class="input"
+                       name="email"
+                       placeholder="email@example.com"
+                       type="email"
+                       required />
+            </div>
+
+            <div class="flex flex-col gap-1 mb-4">
+                <label class="form-label font-normal text-gray-900">
+                    Логін
+                </label>
+                <input class="input"
+                       name="login"
+                       placeholder="Ваш логін"
+                       type="text"
+                       minlength="3"
+                       maxlength="32"
+                       required />
+                <small class="text-xs text-gray-500 mt-1">
+                    3-32 символи
+                </small>
+            </div>
+
+            <button type="submit" class="btn btn-primary flex justify-center w-full mb-2">
+                Зареєструватись
+            </button>
+        </form>
+
+        <div class="flex items-center gap-2 mt-4">
+            <span class="border-t border-gray-200 w-full"></span>
+            <span class="text-2xs text-gray-500 font-medium uppercase">Або</span>
+            <span class="border-t border-gray-200 w-full"></span>
+        </div>
+
+        <div class="flex flex-col gap-2">
+            <a class="btn btn-light justify-center"
+               asp-controller="Account"
+               asp-action="RegisterIn">
+                <svg class="size-3.5 shrink-0 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z" />
+                </svg>
+                Зареєструватись через Email
+            </a>
+
+            <a class="btn btn-light justify-center"
+               asp-controller="Account"
+               asp-action="GoogleLogin">
+                <img alt="" class="size-3.5 shrink-0 mr-2" src="~/assets/media/brand-logos/google.svg" />
+                Зареєструватись через Google
+            </a>
+        </div>
+    </div>
+</div>
